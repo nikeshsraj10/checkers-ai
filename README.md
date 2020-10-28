@@ -2,6 +2,7 @@
 
 This is an American Checkers AI game built using Python.
 
+  ![Checkers Board](https://github.com/nikeshsraj10/checkers-ai/blob/main/images/board.PNG)
 ## Rules:
 Open rules.md to view the rules of the game
 
