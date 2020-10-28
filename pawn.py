@@ -1,3 +1,6 @@
+"""
+This module defines the pawn of the game. It holds the id, coordinate values, start_rowa and if the pawn is a King or not
+"""
 class Pawn:
     def __init__(self, id, row, col, start_row):
         self.id = id

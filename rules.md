@@ -1,6 +1,6 @@
 # Rules
 
-## Game Basics
+## Introduction
 Checkers is played by two players. Each player begins the game with 12 pawns(Black and White). Each player places their pieces on the 12 dark squares closest to them. Black moves first. Players then alternate moves.
 
 The board consists of 64 squares(8 x 8), alternating between 32 dark and 32 light squares. It is positioned so that each player has a light square on the right side corner closest to him or her.
@@ -28,4 +28,7 @@ The board consists of 64 squares(8 x 8), alternating between 32 dark and 32 ligh
 
 ## Win Criteria
 
-A player wins the game when the opponent cannot make a move. In most cases, this is because all of the opponent's pieces have been captured, but it could also be because all of his pieces are blocked in.
+A player wins the game when
+- The opponent cannot make a move because all of their pieces are blocked in.
+- The opponent's pieces have been captured
+- If there has been no captures for the last 50 moves(25 moves for each player)
