@@ -48,8 +48,8 @@ class Game:
                             pawn_selected = True
                     except (KeyboardInterrupt, SystemExit) as e:
                         sys.exit(0)
-                    except Exception as e:
-                        print(f"Enter Input in the proper format {e}")
+                    except:
+                        print("Enter Input in the proper format")
                 coordinate_selected = False
                 while not coordinate_selected:
                     try:
