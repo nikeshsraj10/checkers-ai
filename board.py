@@ -121,10 +121,12 @@ class Board:
                 ne_x, ne_y = self.get_new_coordinates(NORTHEAST, pawn)
                 if (0 <= nw_x < rows) and (0 <= nw_y < cols) and self.board[nw_x][nw_y] >0:
                     nw_nw_x,nw_nw_y = self.get_new_coordinates(NORTHWEST, self.p1_pawns[self.board[nw_x][nw_y]])
-                    get_pawn_moves.append((nw_nw_x,nw_nw_y))
+                    if (0 <= nw_nw_x < rows) and (0 <= nw_nw_y < cols):
+                        get_pawn_moves.append((nw_nw_x,nw_nw_y))
                 if (0 <= ne_x < rows) and (0 <= ne_y < cols) and self.board[ne_x][ne_y] >0:
                     ne_ne_x,ne_ne_y = self.get_new_coordinates(NORTHEAST, self.p1_pawns[self.board[ne_x][ne_y]])
-                    get_pawn_moves.append((ne_ne_x,ne_ne_y))
+                    if (0 <= ne_ne_x < rows) and (0 <= ne_ne_y < cols):
+                        get_pawn_moves.append((ne_ne_x,ne_ne_y))
                 if (0 <= nw_x < rows) and (0 <= nw_y < cols) and self.board[nw_x][nw_y] == 0:
                     get_pawn_moves.append((nw_x,nw_y))
                 if (0 <= ne_x < rows) and (0 <= ne_y < cols) and self.board[ne_x][ne_y] == 0:
@@ -136,10 +138,12 @@ class Board:
                 se_x,se_y = self.get_new_coordinates(SOUTHEAST, pawn)
                 if (0 <= sw_x < rows) and (0 <= sw_y < cols) and self.board[sw_x][sw_y] <0:
                     sw_sw_x,sw_sw_y = self.get_new_coordinates(SOUTHWEST, self.p2_pawns[self.board[sw_x][sw_y]])
-                    get_pawn_moves.append((sw_sw_x,sw_sw_y))
+                    if (0 <= sw_sw_x < rows) and (0 <= sw_sw_y < cols):
+                        get_pawn_moves.append((sw_sw_x,sw_sw_y))
                 if (0 <= se_x < rows) and (0 <= se_y < cols) and self.board[se_x][se_y] <0:
                     se_se_x,se_se_y = self.get_new_coordinates(SOUTHEAST, self.p2_pawns[self.board[se_x][se_y]])
-                    get_pawn_moves.append((se_se_x,se_se_y))
+                    if (0 <= se_se_x < rows) and (0 <= se_se_y < cols):
+                        get_pawn_moves.append((se_se_x,se_se_y))
                 if (0 <= sw_x < rows) and (0 <= sw_y < cols) and self.board[sw_x][sw_y] == 0:
                     get_pawn_moves.append((sw_x,sw_y))
                 if (0 <= se_x < rows) and (0 <= se_y < cols) and self.board[se_x][se_y] == 0:
