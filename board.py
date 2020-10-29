@@ -19,18 +19,16 @@ class Board:
         self.num_of_pawns = ((numOfSquares - 2) / 2) * (numOfSquares / 2)
         self.initialize_players(0, 1)
         self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 0, False)
+        self.total_moves = 0
+        self.moves_since_last_capture = 0
 
     # Initialize player pawns and populate the board with their positions
     def initialize_players(self, start_row, start_index, p1 = True):
-        print(f"params: {start_row}, {start_index}")
         rows, cols = self.board.shape
-        print(f"shape of board is {rows}, {cols}")
         num_rows_to_fill = int((rows - 2) / 2)
-        print(num_rows_to_fill)
         pawn_id = 1
         for row in range(start_row, start_row + num_rows_to_fill):
             for col in range(start_index, cols, 2):
-                print(f"Row Col {row}, {col}")
                 if(p1):
                     self.board[row, col] = pawn_id
                     self.p1_pawns[pawn_id] = pawn.Pawn(pawn_id, row, col, start_row)
@@ -59,10 +57,8 @@ class Board:
         player_available_pawns = []
         rows, cols = self.board.shape
         for p in temp_dict:
-            #print(temp_dict[p])
-            # print(type(temp_dict[p]))
-            x, y = self.get_new_coordinates(dir[0], temp_dict[p]) # dir[0]
-            a, b = self.get_new_coordinates(dir[1], temp_dict[p]) # dir[1]
+            x, y = self.get_new_coordinates(dir[0], temp_dict[p])
+            a, b = self.get_new_coordinates(dir[1], temp_dict[p])
             if (0 <= x < rows) and (0 <= y < cols) and self.board[x][y] == 0 and p not in player_available_pawns:
                 player_available_pawns.append(p)
             elif (0 <= x < rows) and (0 <= y < cols) and self.board[x][y] in p2_list and p not in player_available_pawns:
@@ -163,21 +159,24 @@ class Board:
         :param pawn Pawn object
         :return int  0 for simple move, 1 capturing move and -1 if the move cannot be made
         """
-        new_x, new_y = self.get_new_coordinates(direction)
+        new_x, new_y = self.get_new_coordinates(direction, pawn)
         new_id = self.board[new_x, new_y]
-        if new_id == 0
+        if new_id == 0:
             return 0
         elif new_id > 0 and pawn.id > 0 or new_id < 0 and pawn.id < 0:
             return -1
         else:
             return 1
     # This method controls the pawn's movement
-    def move_pawn(self, pawn, direction):
+    def move_pawn(self, pawn, coordinate):
         """
             This method handle the pawn movement inside the board
             :param pawn_id int
             Changes the position of the pawn selected and state of board
         """
+        direction = self.get_direction_from_coordinates(pawn, coordinate)
+        self.total_moves += 1
+        self.moves_since_last_capture += 1
         if self.check_move_type(pawn, direction) == 0:
             self.simple_move(pawn, direction)
         elif self.check_move_type(pawn, direction) == 1:
@@ -192,9 +191,9 @@ class Board:
         pawn_id = pawn.id
         pawn_coordinates = pawn.coordinates
         rival_pawn_coordinates = self.get_new_coordinates(direction, pawn)
-        rival_pawn = self.p1_pawns[self.board[rival_pawn_coordinates] if self.board[rival_pawn_coordinates] > 0 else self.p2_pawns[self.board[rival_pawn_coordinates]
+        rival_pawn = self.p1_pawns[self.board[rival_pawn_coordinates]] if self.board[rival_pawn_coordinates] > 0 else self.p2_pawns[self.board[rival_pawn_coordinates]]
         new_x, new_y = self.get_new_coordinates(direction, rival_pawn)
-        self.remove_pawn(self, pawn, rival_pawn.id > 0)
+        self.remove_pawn(rival_pawn, rival_pawn.id > 0)
         self.update_board_pawn(new_x, new_y, pawn, pawn.id > 0)
     # This method is used when the move type is simple, move the pawn diagonally, change the state of board and coordinate of given pawn
     def simple_move(self, pawn, direction):
@@ -208,16 +207,17 @@ class Board:
         self.board[new_x, new_y] = pawn.id
         self.board[pawn.coordinates] = 0
         if(p1):
-            self.p1_pawns(pawn.id).coordinates = (new_x, new_y)
+            self.p1_pawns[pawn.id].coordinates = (new_x, new_y)
         else:
-            self.p2_pawns(pawn.id).coordinates = (new_x, new_y)
+            self.p2_pawns[pawn.id].coordinates = (new_x, new_y)
     # This method is used to remove pawn from players' dictionary and updates the state of board
     def remove_pawn(self, pawn, p1 = True):
+        self.moves_since_last_capture = 0
         pawn_id = pawn.id
         pawn_coordinates = pawn.coordinates
         if p1:
             self.p1_pawns.pop(pawn_id, None)
-        else
+        else:
             self.p2_pawns.pop(pawn_id, None)
         self.board[pawn_coordinates] = 0
     # This method checks if the game is over or not.
@@ -241,8 +241,19 @@ class Board:
             return -1
         else:
             return 0
-
+    # This method gives the direction from the given pawn and new coordinate
+    def get_direction_from_coordinates(self, pawn, new_coordinate):
+        x,y = (pawn.coordinates)
+        new_x, new_y = new_coordinate
+        if x > new_x and y > new_y:
+            return NORTHWEST
+        elif x < new_x and y > new_y:
+            return SOUTHWEST
+        elif x > new_x and y < new_y:
+            return NORTHEAST
+        elif x < new_x and y < new_y:
+            return SOUTHEAST
     # String representation of the Board object
     def __str__(self):
-        return f"Object details: \n{self.board}\n {self.p1_pawns} \n {self.p2_pawns}"
+        return f"Object details: \n{self.board}\n"
 
