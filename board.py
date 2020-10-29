@@ -44,24 +44,34 @@ class Board:
             else:
                 start_index = 0
 
-    def check_normal_pawn(self,player_pawns_list,p2_list,dir):
+    def update_board_pawn(self, new_x, new_y, pawn, p1=True):
+        old_x, old_y = pawn.coordinates
+        temp = self.board[new_x][new_y]
+        self.board[new_x][new_y] = pawn.id
+        self.board[old_x][old_y] = temp
+        if p1:
+            self.p1_pawns[pawn.id].coordinates = (new_x,new_y)
+        else:
+            self.p2_pawns[pawn.id].coordinates = (new_x, new_y)
+
+    def get_available_pawns(self,player_pawns_list,p2_list,dir):
         temp_dict = player_pawns_list
         player_available_pawns = []
         for p in temp_dict:
             #print(temp_dict[p])
             # print(type(temp_dict[p]))
-            x, y = self.rel(dir[0], temp_dict[p]) # dir[0]
-            a, b = self.rel(dir[1], temp_dict[p]) # dir[1]
+            x, y = self.get_new_coordinates(dir[0], temp_dict[p]) # dir[0]
+            a, b = self.get_new_coordinates(dir[1], temp_dict[p]) # dir[1]
             if (0 <= x < 8) and (0 <= y < 8) and self.board[x][y] == 0 and p not in player_available_pawns:
                 player_available_pawns.append(p)
             elif (0 <= x < 8) and (0 <= y < 8) and self.board[x][y] in p2_list and p not in player_available_pawns:
-                x1, y1 = self.rel(dir[0], p2_list[self.board[x][y]])
+                x1, y1 = self.get_new_coordinates(dir[0], p2_list[self.board[x][y]])
                 if self.board[x1,y1] == 0 and p not in player_available_pawns:
                     player_available_pawns.append(p)
             if (0 <= a < 8) and (0 <= b < 8) and self.board[a][b] == 0 and p not in player_available_pawns:
                 player_available_pawns.append(p)
             elif (0 <= a < 8) and (0 <= b < 8) and self.board[a][b] in p2_list and p not in player_available_pawns:
-                a1, b1 = self.rel(dir[0], p2_list[self.board[a][b]])
+                a1, b1 = self.get_new_coordinates(dir[0], p2_list[self.board[a][b]])
                 if self.board[a1,b1] == 0 and p not in player_available_pawns:
                     player_available_pawns.append(p)
 
@@ -75,16 +85,20 @@ class Board:
         Available pawns to move
         """
         if p1 == True:
-            return self.check_normal_pawn(self.p1_pawns,self.p2_pawns,[SOUTHWEST,SOUTHEAST])
+            self.board[2][1] = 0
+            self.board[4][1] = 9
+            self.board[2][3] = 0
+            self.board[4][3] = 10
+            return self.get_available_pawns(self.p1_pawns,self.p2_pawns,[SOUTHWEST,SOUTHEAST])
         else:
-            return self.check_normal_pawn(self.p2_pawns,self.p1_pawns,[NORTHWEST,NORTHEAST])
+            return self.get_available_pawns(self.p2_pawns,self.p1_pawns,[NORTHWEST,NORTHEAST])
 
-    def rel(self, dir, pawn):
+
+    def get_new_coordinates(self, dir, pawn):
         """
         Returns the coordinates one square in a different direction to (x,y).
         """
         x,y = (pawn.coordinates)
-
         if dir == NORTHWEST:
             return x - 1, y - 1
         elif dir == SOUTHWEST:
@@ -96,7 +110,6 @@ class Board:
         else:
             return 0
 
-
     # This method is used to check the possible coordinates that the pawn can move to
     def get_moves(self, pawn):
         """
@@ -107,17 +120,16 @@ class Board:
         """
         x, y = (pawn.coordinates)
         pawn_id = self.board[x][y]
-
         if pawn_id != 0:
-            if pawn_id < 0 and pawn.is_king == False:
-                get_pawn_moves = [self.rel(NORTHWEST, pawn), self.rel(NORTHEAST, pawn)]
+            if pawn_id < 0 and pawn.is_king is False:
+                get_pawn_moves = [self.get_new_coordinates(NORTHWEST, pawn), self.get_new_coordinates(NORTHEAST, pawn)]
 
-            elif pawn_id > 0 and pawn.is_king == False:
-                get_pawn_moves = [self.rel(SOUTHWEST, pawn), self.rel(SOUTHEAST, pawn)]
+            elif pawn_id > 0 and pawn.is_king is False:
+                get_pawn_moves = [self.get_new_coordinates(SOUTHWEST, pawn), self.get_new_coordinates(SOUTHEAST, pawn)]
 
             else:
-                get_pawn_moves = [self.rel(NORTHWEST, pawn), self.rel(NORTHEAST, pawn),
-                                  self.rel(SOUTHWEST, pawn), self.rel(SOUTHEAST, pawn)]
+                get_pawn_moves = [self.get_new_coordinates(NORTHWEST, pawn), self.get_new_coordinates(NORTHEAST, pawn),
+                                  self.get_new_coordinates(SOUTHWEST, pawn), self.get_new_coordinates(SOUTHEAST, pawn)]
         else:
             get_pawn_moves = []
 

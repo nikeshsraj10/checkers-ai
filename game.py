@@ -23,6 +23,9 @@ class Game:
                     board = Board.Board(10)
                     break
             print(board)
+            board.update_board_pawn(4, 1, board.p1_pawns[9],True)
+            board.update_board_pawn(4, 3, board.p1_pawns[10],True)
+            print(board)
             print("Which pawn to be moved")
             lis = board.check_available_pawns_to_move(True)
             print(lis)
