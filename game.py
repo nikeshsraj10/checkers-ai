@@ -4,6 +4,9 @@
 import board as Board
 
 class Game:
+    def __init__(self):
+        self.jump = False
+
     def start_game(self):
         print("Select the board configuration you want to play")
         try:
@@ -20,5 +23,9 @@ class Game:
                     board = Board.Board(10)
                     break
             print(board)
+            print("Which pawn to be moved")
+            lis = board.check_available_pawns_to_move(True)
+            print(lis)
+
         except Exception as e:
             print(f"Error Occurred: {e}")

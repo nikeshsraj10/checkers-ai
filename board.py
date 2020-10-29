@@ -4,6 +4,12 @@ This modules defines the board of the game based on the configuration the user h
 import numpy as np
 import pawn
 
+##DIRECTIONS##
+NORTHWEST = "northwest"
+NORTHEAST = "northeast"
+SOUTHWEST = "southwest"
+SOUTHEAST = "southeast"
+
 class Board:
     # Initialize the board based on the config the user requested
     def __init__(self, numOfSquares):
@@ -13,6 +19,7 @@ class Board:
         self.num_of_pawns = ((numOfSquares - 2) / 2) * (numOfSquares / 2)
         self.initialize_players(0, 1)
         self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 0, False)
+
     # Initialize player pawns and populate the board with their positions
     def initialize_players(self, start_row, start_index, p1 = True):
         print(f"params: {start_row}, {start_index}")
@@ -30,24 +37,92 @@ class Board:
                     pawn_id += 1
                 else:
                     self.board[row, col] = -pawn_id
-                    self.p1_pawns[-pawn_id] = pawn.Pawn(-pawn_id, row, col, start_row)
+                    self.p2_pawns[-pawn_id] = pawn.Pawn(-pawn_id, row, col, start_row)
                     pawn_id += 1
             if start_index == 0:
                 start_index = 1
             else:
                 start_index = 0
+
+    def check_normal_pawn(self,player_pawns_list,p2_list,dir):
+        temp_dict = player_pawns_list
+        player_available_pawns = []
+        for p in temp_dict:
+            #print(temp_dict[p])
+            # print(type(temp_dict[p]))
+            x, y = self.rel(dir[0], temp_dict[p]) # dir[0]
+            a, b = self.rel(dir[1], temp_dict[p]) # dir[1]
+            if (0 <= x < 8) and (0 <= y < 8) and self.board[x][y] == 0 and p not in player_available_pawns:
+                player_available_pawns.append(p)
+            elif (0 <= x < 8) and (0 <= y < 8) and self.board[x][y] in p2_list and p not in player_available_pawns:
+                x1, y1 = self.rel(dir[0], p2_list[self.board[x][y]])
+                if self.board[x1,y1] == 0 and p not in player_available_pawns:
+                    player_available_pawns.append(p)
+            if (0 <= a < 8) and (0 <= b < 8) and self.board[a][b] == 0 and p not in player_available_pawns:
+                player_available_pawns.append(p)
+            elif (0 <= a < 8) and (0 <= b < 8) and self.board[a][b] in p2_list and p not in player_available_pawns:
+                a1, b1 = self.rel(dir[0], p2_list[self.board[a][b]])
+                if self.board[a1,b1] == 0 and p not in player_available_pawns:
+                    player_available_pawns.append(p)
+
+        return player_available_pawns
+
     # This method is used to search for all the movable pawns of the players
     def check_available_pawns_to_move(self, p1=False):
         """
         :param p1 boolean 
         :return array array of pawns that can move forward/backward
+        Available pawns to move
         """
+        if p1 == True:
+            return self.check_normal_pawn(self.p1_pawns,self.p2_pawns,[SOUTHWEST,SOUTHEAST])
+        else:
+            return self.check_normal_pawn(self.p2_pawns,self.p1_pawns,[NORTHWEST,NORTHEAST])
+
+    def rel(self, dir, pawn):
+        """
+        Returns the coordinates one square in a different direction to (x,y).
+        """
+        x,y = (pawn.coordinates)
+
+        if dir == NORTHWEST:
+            return x - 1, y - 1
+        elif dir == SOUTHWEST:
+            return x + 1, y - 1
+        elif dir == NORTHEAST:
+            return x - 1, y + 1
+        elif dir == SOUTHEAST:
+            return x + 1, y + 1
+        else:
+            return 0
+
+
     # This method is used to check the possible coordinates that the pawn can move to
     def get_moves(self, pawn):
         """
         :param pawn Pawn object
         :return array array of coordinates the pawn can move to
+        Returns a list of legal move locations from a set of coordinates (x,y) on the board.
+        If that location is empty, then get_moves() return an empty list.
         """
+        x, y = (pawn.coordinates)
+        pawn_id = self.board[x][y]
+
+        if pawn_id != 0:
+            if pawn_id < 0 and pawn.is_king == False:
+                get_pawn_moves = [self.rel(NORTHWEST, pawn), self.rel(NORTHEAST, pawn)]
+
+            elif pawn_id > 0 and pawn.is_king == False:
+                get_pawn_moves = [self.rel(SOUTHWEST, pawn), self.rel(SOUTHEAST, pawn)]
+
+            else:
+                get_pawn_moves = [self.rel(NORTHWEST, pawn), self.rel(NORTHEAST, pawn),
+                                  self.rel(SOUTHWEST, pawn), self.rel(SOUTHEAST, pawn)]
+        else:
+            get_pawn_moves = []
+
+        return get_pawn_moves
+
     # This method is used to analyze the move when the pawn is selected
     def check_move_type(self, pawn):
         """
