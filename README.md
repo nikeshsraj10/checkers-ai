@@ -4,7 +4,7 @@ This is an American Checkers AI game built using Python.
 
   ![Checkers Board](https://github.com/nikeshsraj10/checkers-ai/blob/main/images/board.PNG)
 ## Rules:
-Open rules.md to view the rules of the game
+Open [rules.md](./rules.md) to view the rules of the game
 
 
 ## Python Version 
@@ -24,3 +24,4 @@ Clone the repository by using the URL: `https://github.com/nikeshsraj10/checkers
 CD into the game directory: `cd checkers-ai`
 
 Run the main module: `python main.py`
+
