@@ -255,9 +255,9 @@ class Board:
             Returns 1 | 0 | -1, 1 if player1 is the winner, -1 if player2 is the winner and 0 if its a tie
         """
         if len(self.p1_pawns) == 0:
-            return 1
-        elif len(self.p2_pawns) == 0:
             return -1
+        elif len(self.p2_pawns) == 0:
+            return 1
         else:
             return 0
     # This method gives the direction from the given pawn and new coordinate
