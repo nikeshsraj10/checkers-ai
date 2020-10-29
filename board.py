@@ -121,10 +121,12 @@ class Board:
                 ne_x, ne_y = self.get_new_coordinates(NORTHEAST, pawn)
                 if (0 <= nw_x < rows) and (0 <= nw_y < cols) and self.board[nw_x][nw_y] >0:
                     nw_nw_x,nw_nw_y = self.get_new_coordinates(NORTHWEST, self.p1_pawns[self.board[nw_x][nw_y]])
-                    get_pawn_moves.append((nw_nw_x,nw_nw_y))
+                    if (0 <= nw_nw_x < rows) and (0 <= nw_nw_y < cols) and self.board[nw_nw_x][nw_nw_y] == 0:
+                        get_pawn_moves.append((nw_nw_x,nw_nw_y))
                 if (0 <= ne_x < rows) and (0 <= ne_y < cols) and self.board[ne_x][ne_y] >0:
                     ne_ne_x,ne_ne_y = self.get_new_coordinates(NORTHEAST, self.p1_pawns[self.board[ne_x][ne_y]])
-                    get_pawn_moves.append((ne_ne_x,ne_ne_y))
+                    if (0 <= ne_ne_x < rows) and (0 <= ne_ne_y < cols) and self.board[ne_ne_x][ne_ne_y] == 0:
+                        get_pawn_moves.append((ne_ne_x,ne_ne_y))
                 if (0 <= nw_x < rows) and (0 <= nw_y < cols) and self.board[nw_x][nw_y] == 0:
                     get_pawn_moves.append((nw_x,nw_y))
                 if (0 <= ne_x < rows) and (0 <= ne_y < cols) and self.board[ne_x][ne_y] == 0:
@@ -136,10 +138,12 @@ class Board:
                 se_x,se_y = self.get_new_coordinates(SOUTHEAST, pawn)
                 if (0 <= sw_x < rows) and (0 <= sw_y < cols) and self.board[sw_x][sw_y] <0:
                     sw_sw_x,sw_sw_y = self.get_new_coordinates(SOUTHWEST, self.p2_pawns[self.board[sw_x][sw_y]])
-                    get_pawn_moves.append((sw_sw_x,sw_sw_y))
+                    if (0 <= sw_sw_x < rows) and (0 <= sw_sw_y < cols) and self.board[sw_sw_x][sw_sw_y] == 0:
+                        get_pawn_moves.append((sw_sw_x,sw_sw_y))
                 if (0 <= se_x < rows) and (0 <= se_y < cols) and self.board[se_x][se_y] <0:
                     se_se_x,se_se_y = self.get_new_coordinates(SOUTHEAST, self.p2_pawns[self.board[se_x][se_y]])
-                    get_pawn_moves.append((se_se_x,se_se_y))
+                    if (0 <= se_se_x < rows) and (0 <= se_se_y < cols) and self.board[se_se_x][se_se_y] == 0 :
+                        get_pawn_moves.append((se_se_x,se_se_y))
                 if (0 <= sw_x < rows) and (0 <= sw_y < cols) and self.board[sw_x][sw_y] == 0:
                     get_pawn_moves.append((sw_x,sw_y))
                 if (0 <= se_x < rows) and (0 <= se_y < cols) and self.board[se_x][se_y] == 0:
@@ -147,11 +151,12 @@ class Board:
 
             else:
                 get_pawn_moves = [self.get_new_coordinates(NORTHWEST, pawn), self.get_new_coordinates(NORTHEAST, pawn),
-                                  self.get_new_coordinates(SOUTHWEST, pawn), self.get_new_coordinates(SOUTHEAST, pawn)]
+                                self.get_new_coordinates(SOUTHWEST, pawn), self.get_new_coordinates(SOUTHEAST, pawn)]
         else:
             get_pawn_moves = []
 
         return get_pawn_moves
+
 
     # This method is used to analyze the move when the pawn is selected
     def check_move_type(self, pawn, direction):
@@ -173,16 +178,30 @@ class Board:
             This method handle the pawn movement inside the board
             :param pawn_id int
             Changes the position of the pawn selected and state of board
+            :return list if the move is of type capture and can be chained
         """
         direction = self.get_direction_from_coordinates(pawn, coordinate)
         self.total_moves += 1
         self.moves_since_last_capture += 1
+        chain_capture_coordinates = []
         if self.check_move_type(pawn, direction) == 0:
             self.simple_move(pawn, direction)
         elif self.check_move_type(pawn, direction) == 1:
             self.move_capture_pawn(pawn, direction)
             #  Check if the move can be chained by another capture
-            # return not self.check_move_type(pawn, NORTHEAST) or not self.check_move_type(pawn, NORTHWEST)
+            chain_capture_coordinates = self.get_chain_capture_coordinates(pawn)
+        if (pawn.id > 0 and pawn.coordinates[0] == self.board.shape[0] - 1) or (pawn.id < 0 and pawn.coordinates[0] == 0):
+            pawn.is_king = True
+        return chain_capture_coordinates
+            
+    def get_chain_capture_coordinates(self, pawn):
+        chain_capture_coordinates = []
+        moves_list = self.get_moves(pawn)
+        for coordinate in moves_list:
+            move_type = self.check_move_type(pawn, self.get_direction_from_coordinates(pawn, coordinate))
+            if move_type == 1:
+                chain_capture_coordinates.append(coordinate)
+        return chain_capture_coordinates
     # This method is used when the move type is a capturing move
     def move_capture_pawn(self, pawn, direction):
         """
