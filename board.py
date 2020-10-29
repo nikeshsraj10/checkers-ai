@@ -183,6 +183,7 @@ class Board:
         direction = self.get_direction_from_coordinates(pawn, coordinate)
         self.total_moves += 1
         self.moves_since_last_capture += 1
+        chain_capture_coordinates = []
         if self.check_move_type(pawn, direction) == 0:
             self.simple_move(pawn, direction)
         elif self.check_move_type(pawn, direction) == 1:
@@ -191,7 +192,7 @@ class Board:
             chain_capture_coordinates = self.get_chain_capture_coordinates(pawn)
         if (pawn.id > 0 and pawn.coordinates[0] == self.board.shape[0] - 1) or (pawn.id < 0 and pawn.coordinates[0] == 0):
             pawn.is_king = True
-        return chain_capture_coordinates if len(chain_capture_coordinates) > 0 else []
+        return chain_capture_coordinates
             
     def get_chain_capture_coordinates(self, pawn):
         chain_capture_coordinates = []
