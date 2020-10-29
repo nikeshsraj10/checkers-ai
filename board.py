@@ -57,19 +57,24 @@ class Board:
         player_available_pawns = []
         rows, cols = self.board.shape
         for p in temp_dict:
-            x, y = self.get_new_coordinates(dir[0], temp_dict[p])
-            a, b = self.get_new_coordinates(dir[1], temp_dict[p])
-            if (0 <= x < rows) and (0 <= y < cols) and self.board[x][y] == 0 and p not in player_available_pawns:
-                player_available_pawns.append(p)
-            elif (0 <= x < rows) and (0 <= y < cols) and self.board[x][y] in p2_list and p not in player_available_pawns:
-                x1, y1 = self.get_new_coordinates(dir[0], p2_list[self.board[x][y]])
-                if self.board[x1,y1] == 0 and p not in player_available_pawns:
+            if not temp_dict[int(p)].is_king:
+                x, y = self.get_new_coordinates(dir[0], temp_dict[p])
+                a, b = self.get_new_coordinates(dir[1], temp_dict[p])
+                if (0 <= x < rows) and (0 <= y < cols) and self.board[x][y] == 0 and p not in player_available_pawns:
                     player_available_pawns.append(p)
-            if (0 <= a < rows) and (0 <= b < cols) and self.board[a][b] == 0 and p not in player_available_pawns:
-                player_available_pawns.append(p)
-            elif (0 <= a < rows) and (0 <= b < cols) and self.board[a][b] in p2_list and p not in player_available_pawns:
-                a1, b1 = self.get_new_coordinates(dir[1], p2_list[self.board[a][b]])
-                if self.board[a1,b1] == 0 and p not in player_available_pawns:
+                elif (0 <= x < rows) and (0 <= y < cols) and self.board[x][y] in p2_list and p not in player_available_pawns:
+                    x1, y1 = self.get_new_coordinates(dir[0], p2_list[self.board[x][y]])
+                    if self.board[x1,y1] == 0 and p not in player_available_pawns:
+                        player_available_pawns.append(p)
+                if (0 <= a < rows) and (0 <= b < cols) and self.board[a][b] == 0 and p not in player_available_pawns:
+                    player_available_pawns.append(p)
+                elif (0 <= a < rows) and (0 <= b < cols) and self.board[a][b] in p2_list and p not in player_available_pawns:
+                    a1, b1 = self.get_new_coordinates(dir[1], p2_list[self.board[a][b]])
+                    if self.board[a1,b1] == 0 and p not in player_available_pawns:
+                        player_available_pawns.append(p)
+            else:
+                temp_list = self.get_kings_move(temp_dict[p])
+                if len(temp_list) > 0:
                     player_available_pawns.append(p)
 
         return player_available_pawns
@@ -121,11 +126,11 @@ class Board:
                 ne_x, ne_y = self.get_new_coordinates(NORTHEAST, pawn)
                 if (0 <= nw_x < rows) and (0 <= nw_y < cols) and self.board[nw_x][nw_y] >0:
                     nw_nw_x,nw_nw_y = self.get_new_coordinates(NORTHWEST, self.p1_pawns[self.board[nw_x][nw_y]])
-                    if (0 <= nw_nw_x < rows) and (0 <= nw_nw_y < cols):
+                    if (0 <= nw_nw_x < rows) and (0 <= nw_nw_y < cols) and self.board[nw_nw_x][nw_nw_y] == 0:
                         get_pawn_moves.append((nw_nw_x,nw_nw_y))
                 if (0 <= ne_x < rows) and (0 <= ne_y < cols) and self.board[ne_x][ne_y] >0:
                     ne_ne_x,ne_ne_y = self.get_new_coordinates(NORTHEAST, self.p1_pawns[self.board[ne_x][ne_y]])
-                    if (0 <= ne_ne_x < rows) and (0 <= ne_ne_y < cols):
+                    if (0 <= ne_ne_x < rows) and (0 <= ne_ne_y < cols) and self.board[ne_ne_x][ne_ne_y] == 0:
                         get_pawn_moves.append((ne_ne_x,ne_ne_y))
                 if (0 <= nw_x < rows) and (0 <= nw_y < cols) and self.board[nw_x][nw_y] == 0:
                     get_pawn_moves.append((nw_x,nw_y))
@@ -138,11 +143,11 @@ class Board:
                 se_x,se_y = self.get_new_coordinates(SOUTHEAST, pawn)
                 if (0 <= sw_x < rows) and (0 <= sw_y < cols) and self.board[sw_x][sw_y] <0:
                     sw_sw_x,sw_sw_y = self.get_new_coordinates(SOUTHWEST, self.p2_pawns[self.board[sw_x][sw_y]])
-                    if (0 <= sw_sw_x < rows) and (0 <= sw_sw_y < cols):
+                    if (0 <= sw_sw_x < rows) and (0 <= sw_sw_y < cols) and self.board[sw_sw_x][sw_sw_y] == 0:
                         get_pawn_moves.append((sw_sw_x,sw_sw_y))
                 if (0 <= se_x < rows) and (0 <= se_y < cols) and self.board[se_x][se_y] <0:
                     se_se_x,se_se_y = self.get_new_coordinates(SOUTHEAST, self.p2_pawns[self.board[se_x][se_y]])
-                    if (0 <= se_se_x < rows) and (0 <= se_se_y < cols):
+                    if (0 <= se_se_x < rows) and (0 <= se_se_y < cols) and self.board[se_se_x][se_se_y] == 0 :
                         get_pawn_moves.append((se_se_x,se_se_y))
                 if (0 <= sw_x < rows) and (0 <= sw_y < cols) and self.board[sw_x][sw_y] == 0:
                     get_pawn_moves.append((sw_x,sw_y))
@@ -150,9 +155,7 @@ class Board:
                     get_pawn_moves.append((se_x,se_y))
 
             else:
-                get_pawn_moves = [self.get_kings_move(pawn)]
-                # get_pawn_moves = [self.get_new_coordinates(NORTHWEST, pawn), self.get_new_coordinates(NORTHEAST, pawn),
-                #                   self.get_new_coordinates(SOUTHWEST, pawn), self.get_new_coordinates(SOUTHEAST, pawn)]
+                get_pawn_moves = self.get_kings_move(pawn)
         else:
             get_pawn_moves = []
 
@@ -169,11 +172,11 @@ class Board:
                 ne_x, ne_y = self.get_new_coordinates(NORTHEAST, pawn)
                 if (0 <= nw_x < rows) and (0 <= nw_y < cols) and self.board[nw_x][nw_y] >0:
                     nw_nw_x,nw_nw_y = self.get_new_coordinates(NORTHWEST, self.p1_pawns[self.board[nw_x][nw_y]])
-                    if (0 <= nw_nw_x < rows) and (0 <= nw_nw_y < cols):
+                    if (0 <= nw_nw_x < rows) and (0 <= nw_nw_y < cols) and self.board[nw_nw_x][nw_nw_y] == 0:
                         get_pawn_moves.append((nw_nw_x,nw_nw_y))
                 if (0 <= ne_x < rows) and (0 <= ne_y < cols) and self.board[ne_x][ne_y] >0:
                     ne_ne_x,ne_ne_y = self.get_new_coordinates(NORTHEAST, self.p1_pawns[self.board[ne_x][ne_y]])
-                    if (0 <= ne_ne_x < rows) and (0 <= ne_ne_y < cols):
+                    if (0 <= ne_ne_x < rows) and (0 <= ne_ne_y < cols) and self.board[ne_ne_x][ne_ne_y] ==0:
                         get_pawn_moves.append((ne_ne_x,ne_ne_y))
                 if (0 <= nw_x < rows) and (0 <= nw_y < cols) and self.board[nw_x][nw_y] == 0:
                     get_pawn_moves.append((nw_x,nw_y))
@@ -182,12 +185,12 @@ class Board:
                 sw_x, sw_y = self.get_new_coordinates(SOUTHWEST, pawn)
                 se_x, se_y = self.get_new_coordinates(SOUTHEAST, pawn)
                 if (0 <= sw_x < rows) and (0 <= sw_y < cols) and self.board[sw_x][sw_y] > 0:
-                    sw_sw_x, sw_sw_y = self.get_new_coordinates(SOUTHWEST, self.p2_pawns[self.board[sw_x][sw_y]])
-                    if (0 <= sw_sw_x < rows) and (0 <= sw_sw_y < cols):
+                    sw_sw_x, sw_sw_y = self.get_new_coordinates(SOUTHWEST, self.p1_pawns[self.board[sw_x][sw_y]])
+                    if (0 <= sw_sw_x < rows) and (0 <= sw_sw_y < cols) and self.board[sw_sw_x][sw_sw_y] == 0:
                         get_pawn_moves.append((sw_sw_x, sw_sw_y))
                 if (0 <= se_x < rows) and (0 <= se_y < cols) and self.board[se_x][se_y] > 0:
-                    se_se_x, se_se_y = self.get_new_coordinates(SOUTHEAST, self.p2_pawns[self.board[se_x][se_y]])
-                    if (0 <= se_se_x < rows) and (0 <= se_se_y < cols):
+                    se_se_x, se_se_y = self.get_new_coordinates(SOUTHEAST, self.p1_pawns[self.board[se_x][se_y]])
+                    if (0 <= se_se_x < rows) and (0 <= se_se_y < cols) and self.board[se_se_x][se_se_y] == 0:
                         get_pawn_moves.append((se_se_x, se_se_y))
                 if (0 <= sw_x < rows) and (0 <= sw_y < cols) and self.board[sw_x][sw_y] == 0:
                     get_pawn_moves.append((sw_x, sw_y))
@@ -197,12 +200,12 @@ class Board:
                 nw_x, nw_y = self.get_new_coordinates(NORTHWEST, pawn)
                 ne_x, ne_y = self.get_new_coordinates(NORTHEAST, pawn)
                 if (0 <= nw_x < rows) and (0 <= nw_y < cols) and self.board[nw_x][nw_y] <0:
-                    nw_nw_x,nw_nw_y = self.get_new_coordinates(NORTHWEST, self.p1_pawns[self.board[nw_x][nw_y]])
-                    if (0 <= nw_nw_x < rows) and (0 <= nw_nw_y < cols):
+                    nw_nw_x,nw_nw_y = self.get_new_coordinates(NORTHWEST, self.p2_pawns[self.board[nw_x][nw_y]])
+                    if (0 <= nw_nw_x < rows) and (0 <= nw_nw_y < cols) and self.board[nw_nw_x][nw_nw_y] ==0:
                         get_pawn_moves.append((nw_nw_x,nw_nw_y))
                 if (0 <= ne_x < rows) and (0 <= ne_y < cols) and self.board[ne_x][ne_y] <0:
-                    ne_ne_x,ne_ne_y = self.get_new_coordinates(NORTHEAST, self.p1_pawns[self.board[ne_x][ne_y]])
-                    if (0 <= ne_ne_x < rows) and (0 <= ne_ne_y < cols):
+                    ne_ne_x,ne_ne_y = self.get_new_coordinates(NORTHEAST, self.p2_pawns[self.board[ne_x][ne_y]])
+                    if (0 <= ne_ne_x < rows) and (0 <= ne_ne_y < cols) and self.board[ne_ne_x][ne_ne_y] ==0:
                         get_pawn_moves.append((ne_ne_x,ne_ne_y))
                 if (0 <= nw_x < rows) and (0 <= nw_y < cols) and self.board[nw_x][nw_y] == 0:
                     get_pawn_moves.append((nw_x,nw_y))
@@ -212,16 +215,17 @@ class Board:
                 se_x, se_y = self.get_new_coordinates(SOUTHEAST, pawn)
                 if (0 <= sw_x < rows) and (0 <= sw_y < cols) and self.board[sw_x][sw_y] < 0:
                     sw_sw_x, sw_sw_y = self.get_new_coordinates(SOUTHWEST, self.p2_pawns[self.board[sw_x][sw_y]])
-                    if (0 <= sw_sw_x < rows) and (0 <= sw_sw_y < cols):
+                    if (0 <= sw_sw_x < rows) and (0 <= sw_sw_y < cols) and self.board[sw_sw_x][sw_sw_y] ==0:
                         get_pawn_moves.append((sw_sw_x, sw_sw_y))
                 if (0 <= se_x < rows) and (0 <= se_y < cols) and self.board[se_x][se_y] < 0:
                     se_se_x, se_se_y = self.get_new_coordinates(SOUTHEAST, self.p2_pawns[self.board[se_x][se_y]])
-                    if (0 <= se_se_x < rows) and (0 <= se_se_y < cols):
+                    if (0 <= se_se_x < rows) and (0 <= se_se_y < cols) and self.board[se_se_x][se_se_y] == 0:
                         get_pawn_moves.append((se_se_x, se_se_y))
                 if (0 <= sw_x < rows) and (0 <= sw_y < cols) and self.board[sw_x][sw_y] == 0:
                     get_pawn_moves.append((sw_x, sw_y))
                 if (0 <= se_x < rows) and (0 <= se_y < cols) and self.board[se_x][se_y] == 0:
                     get_pawn_moves.append((se_x, se_y))
+        return get_pawn_moves
 
     # This method is used to analyze the move when the pawn is selected
     def check_move_type(self, pawn, direction):
@@ -243,16 +247,30 @@ class Board:
             This method handle the pawn movement inside the board
             :param pawn_id int
             Changes the position of the pawn selected and state of board
+            :return list if the move is of type capture and can be chained
         """
         direction = self.get_direction_from_coordinates(pawn, coordinate)
         self.total_moves += 1
         self.moves_since_last_capture += 1
+        chain_capture_coordinates = []
         if self.check_move_type(pawn, direction) == 0:
             self.simple_move(pawn, direction)
         elif self.check_move_type(pawn, direction) == 1:
             self.move_capture_pawn(pawn, direction)
             #  Check if the move can be chained by another capture
-            # return not self.check_move_type(pawn, NORTHEAST) or not self.check_move_type(pawn, NORTHWEST)
+            chain_capture_coordinates = self.get_chain_capture_coordinates(pawn)
+        if (pawn.id > 0 and pawn.coordinates[0] == self.board.shape[0] - 1) or (pawn.id < 0 and pawn.coordinates[0] == 0):
+            pawn.is_king = True
+        return chain_capture_coordinates
+            
+    def get_chain_capture_coordinates(self, pawn):
+        chain_capture_coordinates = []
+        moves_list = self.get_moves(pawn)
+        for coordinate in moves_list:
+            move_type = self.check_move_type(pawn, self.get_direction_from_coordinates(pawn, coordinate))
+            if move_type == 1:
+                chain_capture_coordinates.append(coordinate)
+        return chain_capture_coordinates
     # This method is used when the move type is a capturing move
     def move_capture_pawn(self, pawn, direction):
         """
@@ -306,9 +324,9 @@ class Board:
             Returns 1 | 0 | -1, 1 if player1 is the winner, -1 if player2 is the winner and 0 if its a tie
         """
         if len(self.p1_pawns) == 0:
-            return 1
-        elif len(self.p2_pawns) == 0:
             return -1
+        elif len(self.p2_pawns) == 0:
+            return 1
         else:
             return 0
     # This method gives the direction from the given pawn and new coordinate
