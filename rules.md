@@ -3,7 +3,7 @@
 ## Introduction
 Checkers is played by two players. Each player begins the game with 12 pawns(Black and White). Each player places their pieces on the 12 dark squares closest to them. Black moves first. Players then alternate moves.
 
-The board consists of 64 squares(8 x 8), alternating between 32 dark and 32 light squares. It is positioned so that each player has a light square on the right side corner closest to him or her.
+The board consists of 64 squares(8 x 8), alternating between 32 dark and 32 light squares. It is positioned so that each player has a light square on the right side corner closest to them.
 
 ## Rules of the Game
 - Moves are allowed only on the dark squares, so pieces always move diagonally. Single pieces are always limited to forward moves (toward the opponent).
