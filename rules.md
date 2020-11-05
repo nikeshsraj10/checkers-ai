@@ -14,7 +14,7 @@ The board consists of 64 squares(8 x 8), alternating between 32 dark and 32 ligh
 
 - When a piece is captured, it is removed from the board.
 
-- If a player is able to make a capture, there is no option; the jump must be made. If more than one capture is available, the player is free to choose whichever he or she prefers.
+- If a player is able to make a capture, there is no option; the jump must be made. If more than one capture is available, the player is free to choose whichever he or she prefers, but he can only chain once. i.e. A player can only capture 2 pawns in the same move.
 
 - When a piece reaches the furthest row from the player who controls that piece, it is crowned and becomes a king. One of the pieces which had been captured is placed on top of the king so that it is twice as high as a single piece.
 

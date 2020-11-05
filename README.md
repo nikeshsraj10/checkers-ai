@@ -12,7 +12,9 @@ Open [rules.md](./rules.md) to view the rules of the game
 3.8.6
 
 ## Setup
-  You need to have python 3.5++ and numpy to run the code
+  Python version: 3.0+
+  ### Libraries
+  - Numpy
 
   ### Install numpy
   Run: `pip install numpy`
