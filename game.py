@@ -110,8 +110,10 @@ class Game:
             winner = board.declare_winner()
             if winner == 1:
                 print("Congratulations! Player1. You Won!!")
+                print(f"Score = {board.compute_score()}")
             elif winner == -1:
                 print("Congratulations! Player2. You Won!!")
+                print(f"Score = {board.compute_score() * -1}")
             else:
                 print("It's a Tie")
         except Exception as e:

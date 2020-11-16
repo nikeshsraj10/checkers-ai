@@ -21,7 +21,10 @@ class Board:
         self.p2_pawns = {}
         self.num_of_pawns = ((numOfSquares - 2) / 2) * (numOfSquares / 2)
         self.initialize_players(0, 1)
-        self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 0, False)
+        if numOfSquares == 8:
+            self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 0, False)
+        elif numOfSquares == 10:
+            self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 1, False)
         self.total_moves = 0
         self.moves_since_last_capture = 0
 

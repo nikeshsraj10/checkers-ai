@@ -30,7 +30,7 @@ class Node():
                 valid_moves = self.state.get_moves(self.state.p1_pawns[pawn])
                 for move in valid_moves:
                     temp_board = deepcopy(self.state)
-                    temp_board.move_pawn(self.state.p1_pawns[pawn], move)
+                    temp_board.move_pawn(temp_board.p1_pawns[pawn], move)
                     self.nodes_processed += 1
                     states.append(Node(temp_board))
         else:
@@ -38,7 +38,7 @@ class Node():
                 valid_moves = self.state.get_moves(self.state.p2_pawns[pawn])
                 for move in valid_moves:
                     temp_board = deepcopy(self.state)
-                    temp_board.move_pawn(self.state.p2_pawns[pawn], move)
+                    temp_board.move_pawn(temp_board.p2_pawns[pawn], move)
                     self.nodes_processed += 1
                     states.append(Node(temp_board))
 
@@ -126,6 +126,8 @@ if __name__ == "__main__":
     moves = -1
     nodes_processed = 0
     while not state.check_game_status():
+        if moves > 45:
+            print("Here")
         moves += 1
         if moves % 2 == 0:
             print(node.state)
@@ -148,11 +150,16 @@ if __name__ == "__main__":
             if node is None:
                 break
         state = node.state
-
+    print(f"Total moves: {moves}")
     if(len(state.p1_pawns) > len(state.p2_pawns)):
         print("MCTS AI Won")
-    else:
+        print(f"Score = {state.compute_score()}")
+    elif len(state.p1_pawns) < len(state.p2_pawns):
         print("BASELINE AI Won")
+        print(f"Score = {state.compute_score() * -1}")
+    else: 
+        print("It's a draw")
+        print(f"Score = {state.compute_score()}")
     print(f"total nodes processed = {bot.tree_node_processed + bot2.tree_node_processed}")
     
     # print(child.state)
