@@ -42,6 +42,7 @@ class Game:
                 except:
                     print("Enter Input in the proper format")
             game_bot = Bot()
+            nodes_processed = 0
             while not board.check_game_status():
                 print(board)
                 print(f"Move #: {board.total_moves}")
@@ -52,8 +53,10 @@ class Game:
                 # Player1 Turn
                 pawn_selected = False
                 if board.total_moves % 2 == 0:
-                            node = Node(board)
-                            node = game_bot.mcts(node)
+                    nodes_processed = game_bot.tree_node_processed
+                    node = Node(board)
+                    node = game_bot.mcts(node)
+                    print(f"Nodes processed this turn {game_bot.tree_node_processed - nodes_processed}")
                 else: 
                     while not pawn_selected:
                         try: 

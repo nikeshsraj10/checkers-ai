@@ -124,23 +124,27 @@ if __name__ == "__main__":
     child = None
     node = Node(state)
     moves = -1
+    nodes_processed = 0
     while not state.check_game_status():
         moves += 1
         if moves % 2 == 0:
             print(node.state)
             print(f"Moves since last capture: {state.moves_since_last_capture}")
             print("AI's turn")
+            nodes_processed = bot.tree_node_processed
             node = bot.mcts(node)
-            print(bot.tree_node_processed)
+            nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
+            print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
             if node is None:
                 break
         else:
             print(node.state)
             print(f"Moves since last capture: {node.state.moves_since_last_capture}")
             print("Baseline AI turn")
-            # np = bot2.tree_node_processed
+            nodes_processed = bot2.tree_node_processed
             node = bot2.base_line_AI(node)
-            print(bot2.tree_node_processed)
+            nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
+            print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
             if node is None:
                 break
         state = node.state
