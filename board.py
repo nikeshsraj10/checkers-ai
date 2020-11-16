@@ -67,14 +67,14 @@ class Board:
                         player_available_pawns.append(p)
                     elif self.board[x][y] in p2_list:
                         x1, y1 = self.get_new_coordinates(dir[0], p2_list[self.board[x][y]])
-                        if self.board[x1,y1] == 0:
+                        if self.check_boundry(x1,y1) and self.board[x1,y1] == 0:
                             player_available_pawns.append(p)
                 if self.check_boundry(a, b) and p not in player_available_pawns:
                     if self.board[a][b] == 0:
                         player_available_pawns.append(p)
                     elif self.board[a][b] in p2_list:
                         a1, b1 = self.get_new_coordinates(dir[1], p2_list[self.board[a][b]])
-                        if self.board[a1,b1] == 0:
+                        if self.check_boundry(a1,b1) and self.board[a1,b1] == 0:
                             player_available_pawns.append(p)
             else:
                 temp_list = self.get_kings_move(temp_dict[p])
@@ -279,7 +279,7 @@ class Board:
             This method checks the status of the game
             Returns true if the game is over and false if the game is still active in progress
         """
-        if self.moves_since_last_capture > 50 or len(self.p1_pawns) == 0 or len(self.p2_pawns) == 0:
+        if self.moves_since_last_capture > 40 or len(self.p1_pawns) == 0 or len(self.p2_pawns) == 0:
             return True
         return False
     # This method is used to declare winner
