@@ -122,7 +122,6 @@ if __name__ == "__main__":
     bot = Bot()
     bot2 = Bot()
     child = None
-    total_nodes_processed = 0
     node = Node(state)
     moves = -1
     while not state.check_game_status():
@@ -132,7 +131,6 @@ if __name__ == "__main__":
             print(f"Moves since last capture: {state.moves_since_last_capture}")
             print("AI's turn")
             node = bot.mcts(node)
-            total_nodes_processed += bot.tree_node_processed
             print(bot.tree_node_processed)
             if node is None:
                 break
@@ -142,7 +140,6 @@ if __name__ == "__main__":
             print("Baseline AI turn")
             # np = bot2.tree_node_processed
             node = bot2.base_line_AI(node)
-            total_nodes_processed += bot2.tree_node_processed
             print(bot2.tree_node_processed)
             if node is None:
                 break
@@ -152,6 +149,6 @@ if __name__ == "__main__":
         print("MCTS AI Won")
     else:
         print("BASELINE AI Won")
-    print(f"total nodes processed = {total_nodes_processed}")
+    print(f"total nodes processed = {bot.tree_node_processed + bot2.tree_node_processed}")
     
     # print(child.state)
