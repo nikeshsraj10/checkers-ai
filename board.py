@@ -306,6 +306,18 @@ class Board:
             return NORTHEAST
         elif x < new_x and y < new_y:
             return SOUTHEAST
+
+    def total_kings(self,pawns):
+        count = 0
+        for pawn in pawns.values():
+            if pawn.is_king:
+                count += 1
+        return count
+
+    def compute_score(self):
+        return len(self.p1_pawns) - len(self.p2_pawns) + \
+               (self.total_kings(self.p1_pawns) * 0.5 - self.total_kings(self.p2_pawns) * 0.5)
+
     # String representation of the Board object
     def __str__(self):
         return f"Object details: \n{self.board}\n"
