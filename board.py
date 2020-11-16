@@ -67,14 +67,14 @@ class Board:
                         player_available_pawns.append(p)
                     elif self.board[x][y] in p2_list:
                         x1, y1 = self.get_new_coordinates(dir[0], p2_list[self.board[x][y]])
-                        if self.board[x1,y1] == 0:
+                        if self.check_boundry(x1,y1) and self.board[x1,y1] == 0:
                             player_available_pawns.append(p)
                 if self.check_boundry(a, b) and p not in player_available_pawns:
                     if self.board[a][b] == 0:
                         player_available_pawns.append(p)
                     elif self.board[a][b] in p2_list:
                         a1, b1 = self.get_new_coordinates(dir[1], p2_list[self.board[a][b]])
-                        if self.board[a1,b1] == 0:
+                        if self.check_boundry(a1,b1) and self.board[a1,b1] == 0:
                             player_available_pawns.append(p)
             else:
                 temp_list = self.get_kings_move(temp_dict[p])
@@ -279,7 +279,7 @@ class Board:
             This method checks the status of the game
             Returns true if the game is over and false if the game is still active in progress
         """
-        if self.moves_since_last_capture > 50 or len(self.p1_pawns) == 0 or len(self.p2_pawns) == 0:
+        if self.moves_since_last_capture > 40 or len(self.p1_pawns) == 0 or len(self.p2_pawns) == 0:
             return True
         return False
     # This method is used to declare winner
@@ -293,7 +293,7 @@ class Board:
         elif len(self.p2_pawns) == 0:
             return 1
         else:
-            return 0
+            return 1 if len(self.p1_pawns) > len(self.p2_pawns) else -1
     # This method gives the direction from the given pawn and new coordinate
     def get_direction_from_coordinates(self, pawn, new_coordinate):
         x,y = (pawn.coordinates)
@@ -306,6 +306,18 @@ class Board:
             return NORTHEAST
         elif x < new_x and y < new_y:
             return SOUTHEAST
+
+    def total_kings(self,pawns):
+        count = 0
+        for pawn in pawns.values():
+            if pawn.is_king:
+                count += 1
+        return count
+
+    def compute_score(self):
+        return len(self.p1_pawns) - len(self.p2_pawns) + \
+               (self.total_kings(self.p1_pawns) * 0.5 - self.total_kings(self.p2_pawns) * 0.5)
+
     # String representation of the Board object
     def __str__(self):
         return f"Object details: \n{self.board}\n"
