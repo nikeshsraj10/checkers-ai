@@ -15,9 +15,11 @@ Open [rules.md](./rules.md) to view the rules of the game
   Python version: 3.0+
   ### Libraries
   - Numpy
+  - Matplotlib
 
   ### Install numpy
   Run: `pip install numpy`
+  Run: `pip install matplotlib`
 
 ## How to play?
 
@@ -25,5 +27,8 @@ Clone the repository by using the URL: `https://github.com/nikeshsraj10/checkers
 
 CD into the game directory: `cd checkers-ai`
 
+### To play against our AI:
 Run the main module: `python main.py`
 
+### To watch MCTS AI play against Baseline AI
+Run the bot module: `python bot.py`

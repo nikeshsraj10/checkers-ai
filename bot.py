@@ -14,6 +14,7 @@ class Node():
         self.visit_count = 0
         self.score_total = 0
         self.score_estimate = 0
+        self.nodes_processed = 0
         self.child_list = None  # lazy child generation
 
     def children(self):
@@ -30,6 +31,7 @@ class Node():
                 for move in valid_moves:
                     temp_board = deepcopy(self.state)
                     temp_board.move_pawn(self.state.p1_pawns[pawn], move)
+                    self.nodes_processed += 1
                     states.append(Node(temp_board))
         else:
             for pawn in self.state.check_available_pawns_to_move(False):
@@ -37,6 +39,7 @@ class Node():
                 for move in valid_moves:
                     temp_board = deepcopy(self.state)
                     temp_board.move_pawn(self.state.p2_pawns[pawn], move)
+                    self.nodes_processed += 1
                     states.append(Node(temp_board))
 
         return states
@@ -65,7 +68,7 @@ class Bot:
 
     def rollout(self, node, count):
         child = node.choose_child()
-        if node.state.check_game_status() or count > 15 or child is None:
+        if node.state.check_game_status() or count > 100 or child is None:
             # TODO: Consider King pawn for the score calculation
             result = node.state.compute_score()
         else:
@@ -77,35 +80,40 @@ class Bot:
 
     def mcts(self, node):
         rollout_calls = 0
-        for rollout_counter in range(10):
+        tree_node_processed = 0
+        for rollout_counter in range(25):
             self.rollout(node, rollout_calls + 1)
             rollout_calls = 0
         children = node.children()
         if len(children) == 0:
             return None
-        for child in children:
-            print(child.visit_count)
         max_index = 0
         if len(children) > 0:
             max_score = float('-inf')
             for counter in range(len(children)):
                 score = node.compute_uct(children[counter].score_estimate, node.visit_count,
                                          children[counter].visit_count)
-                print(score)
+                tree_node_processed += children[counter].nodes_processed
+                # print(score)
                 if score > max_score:
                     max_score = score
                     max_index = counter
+        self.tree_node_processed += tree_node_processed
         return children[max_index]
 
     def base_line_AI(self, node):
         rollout_calls = 0
-        for rollout_counter in range(10):
+        tree_node_processed = 0
+        for rollout_counter in range(20):
             self.rollout(node, rollout_calls + 1)
             rollout_calls = 0
         children = node.children()
+        for child in children:
+            tree_node_processed += child.nodes_processed
         if len(children) == 0:
             return None
         a = np.random.randint(len(children))
+        self.tree_node_processed += tree_node_processed
         return children[a]
 
 
@@ -114,24 +122,36 @@ if __name__ == "__main__":
     bot = Bot()
     bot2 = Bot()
     child = None
+    total_nodes_processed = 0
     node = Node(state)
-    for _ in range(250):
-        if _ % 2 == 0:
+    moves = -1
+    while not state.check_game_status():
+        moves += 1
+        if moves % 2 == 0:
             print(node.state)
             print(f"Moves since last capture: {state.moves_since_last_capture}")
             print("AI's turn")
-            node = bot.base_line_AI(node)
+            node = bot.mcts(node)
+            total_nodes_processed += bot.tree_node_processed
+            print(bot.tree_node_processed)
             if node is None:
                 break
         else:
             print(node.state)
             print(f"Moves since last capture: {node.state.moves_since_last_capture}")
             print("Baseline AI turn")
-            node = bot2.mcts(node)
+            # np = bot2.tree_node_processed
+            node = bot2.base_line_AI(node)
+            total_nodes_processed += bot2.tree_node_processed
+            print(bot2.tree_node_processed)
             if node is None:
                 break
         state = node.state
 
-    print(len(state.p2_pawns))
-    print(len(state.p1_pawns))
+    if(len(state.p1_pawns) > len(state.p2_pawns)):
+        print("MCTS AI Won")
+    else:
+        print("BASELINE AI Won")
+    print(f"total nodes processed = {total_nodes_processed}")
+    
     # print(child.state)

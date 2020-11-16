@@ -293,7 +293,7 @@ class Board:
         elif len(self.p2_pawns) == 0:
             return 1
         else:
-            return 0
+            return 1 if len(self.p1_pawns) > len(self.p2_pawns) else -1
     # This method gives the direction from the given pawn and new coordinate
     def get_direction_from_coordinates(self, pawn, new_coordinate):
         x,y = (pawn.coordinates)
