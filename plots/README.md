@@ -1,6 +1,7 @@
 # PLOTS
 
 The below 3 graphs shows the performance of our AI:
+### Data Source: [Data](./Simulated_8x8.txt)
 ### Number of games simulated: 100
 ### Board config: 8x8
 

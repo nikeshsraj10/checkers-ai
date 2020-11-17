@@ -31,12 +31,15 @@ CD into the game directory: `cd checkers-ai`
 Run: `python main.py`
 
 ### Simulate MCTS AI vs Baseline AI
-Run: `python bot_simulate.py` <br/>
-Running the above command would simulate 100 games using a 8x8 board <br/><br/>
 To Configure the board and number of games use the below command <br/>
 Run: `python bot_simulate.py {board_config} {number_of_games}` <br/>
 Valid values for board_config are 8 & 10 <br/> <br/>
 The following command will run 8x8 board for 50 games <br/>
 Run: `python bot_simulate.py 8 50` <br/>
-Refer to `plots` folder for the data on the simulated games
+
+### View data and performance
+
+Run: `cd plots` to check out the plots and the saved data from our simulation <br/>
+View Plots:  [Plots](/plots)
+
 
