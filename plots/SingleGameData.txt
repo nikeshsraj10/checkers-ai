@@ -1,0 +1,4 @@
+Moves List: [132]
+Scores List: [7.0]
+Nodes Processed List MCTS: [3157]
+Nodes Processed List Baseline: [3029]

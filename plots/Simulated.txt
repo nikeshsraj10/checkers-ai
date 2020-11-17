@@ -1,0 +1,4 @@
+Moves List: [-1, -1, -1, -1, -1, -1, -1, -1]
+cores List: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Nodes Processed List MCTS: [0, 0, 0, 0, 0, 0, 0, 0]
+Nodes Processed List Baseline: [0, 0, 0, 0, 0, 0, 0, 0]

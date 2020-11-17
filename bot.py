@@ -118,48 +118,67 @@ class Bot:
 
 
 if __name__ == "__main__":
-    state = Board(8)
-    bot = Bot()
-    bot2 = Bot()
     child = None
+    state = Board(8)
     node = Node(state)
     moves = -1
     nodes_processed = 0
-    while not state.check_game_status():
-        if moves > 45:
-            print("Here")
-        moves += 1
-        if moves % 2 == 0:
-            print(node.state)
-            print(f"Moves since last capture: {state.moves_since_last_capture}")
-            print("AI's turn")
-            nodes_processed = bot.tree_node_processed
-            node = bot.mcts(node)
-            nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
-            print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
-            if node is None:
-                break
-        else:
-            print(node.state)
-            print(f"Moves since last capture: {node.state.moves_since_last_capture}")
-            print("Baseline AI turn")
-            nodes_processed = bot2.tree_node_processed
-            node = bot2.base_line_AI(node)
-            nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
-            print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
-            if node is None:
-                break
-        state = node.state
-    print(f"Total moves: {moves}")
-    if(len(state.p1_pawns) > len(state.p2_pawns)):
-        print("MCTS AI Won")
-        print(f"Score = {state.compute_score()}")
-    elif len(state.p1_pawns) < len(state.p2_pawns):
-        print("BASELINE AI Won")
-        print(f"Score = {state.compute_score() * -1}")
-    else: 
-        print("It's a draw")
-        print(f"Score = {state.compute_score()}")
-    print(f"total nodes processed = {bot.tree_node_processed + bot2.tree_node_processed}")
-    
-    # print(child.state)
+    games = 0
+    moves_list = []
+    scores = []
+    nodes_processed_list_MCTS = []
+    nodes_processed_list_baseline = []
+    while games < 1:
+        state = Board(8)
+        node = Node(state)
+        games += 1
+        moves = -1
+        bot = Bot()
+        bot2 = Bot()
+        while not state.check_game_status():
+            moves += 1
+            print(f"Game #: {games}\nMove #: {moves}")
+            if moves % 2 == 0:
+                print(node.state)
+                print(f"Moves since last capture: {state.moves_since_last_capture}")
+                print("AI's turn")
+                nodes_processed = bot.tree_node_processed
+                node = bot.mcts(node)
+                nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
+                print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
+                if node is None:
+                    break
+            else:
+                print(node.state)
+                print(f"Moves since last capture: {node.state.moves_since_last_capture}")
+                print("Baseline AI turn")
+                nodes_processed = bot2.tree_node_processed
+                node = bot2.base_line_AI(node)
+                nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
+                print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
+                if node is None:
+                    break
+            state = node.state
+        print(f"Total moves: {moves}")
+        score = state.compute_score()
+        if(len(state.p1_pawns) > len(state.p2_pawns)):
+            print("MCTS AI Won")
+            print(f"Score = {score}")
+        elif len(state.p1_pawns) < len(state.p2_pawns):
+            print("BASELINE AI Won")
+            print(f"Score = {score * -1}")
+        else: 
+            print("It's a draw")
+            print(f"Score = {score}")
+        print(f"total nodes processed = {bot.tree_node_processed + bot2.tree_node_processed}")
+        moves_list.append(moves)
+        scores.append(score)
+        nodes_processed_list_MCTS.append(bot.tree_node_processed)
+        nodes_processed_list_baseline.append(bot2.tree_node_processed)
+    with open('plots/SingleGameData.txt', 'w') as f:
+        f.write(f"Moves List: {moves_list}\nScores List: {scores}\nNodes Processed List MCTS: {nodes_processed_list_MCTS}\nNodes Processed List Baseline: {nodes_processed_list_baseline}")
+    print(moves_list)
+    print(scores)
+    print(nodes_processed_list_MCTS)
+    print(nodes_processed_list_baseline)
+    # print(child.state
