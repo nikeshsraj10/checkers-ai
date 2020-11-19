@@ -19,9 +19,18 @@ def check_num_of_games(val):
     except:
         return 100
 
+def accept_board_config(val):
+    try:
+        val = int(val)
+        if(val == 8 or val == 10): 
+            return val
+        return 8
+    except:
+        return 8
+# type = lambda x : x if (x == 8 or x == 10) else 8
 def main():
     parser = argparse.ArgumentParser(description="Enter the size of board and number of games you want to simulate")
-    parser.add_argument('board_config', default = 8, type = lambda x : x if x == 8 or x == 10 else 8 )
+    parser.add_argument('board_config', default = 8, type = accept_board_config)
     parser.add_argument('num_of_games', default = 100, type = check_num_of_games)
     args = parser.parse_args()
     board_config = args.board_config

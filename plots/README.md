@@ -9,13 +9,13 @@ The below 3 graphs shows the performance of our AI:
 
 ![nodes processed MCTS](https://github.com/nikeshsraj10/checkers-ai/blob/main/plots/NodesprocessedMCTS.png)
 
-Average number of nodes processed per game by MCTS is *3410*
+Average number of nodes processed per game by MCTS AI is *3410*
 
 ## Nodes processed by Baseline AI:
 
 ![nodes processed Baseline](https://github.com/nikeshsraj10/checkers-ai/blob/main/plots/NodesprocessedBaseline.png)
 
-Average number of nodes processed per game by MCTS is *3346*
+Average number of nodes processed per game by Baseline AI is *3346*
 
 ## Score distribution 
 
