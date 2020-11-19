@@ -23,7 +23,7 @@ class Board:
         self.initialize_players(0, 1)
         if numOfSquares == 8:
             self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 0, False)
-        elif numOfSquares == 10:
+        elif numOfSquares == 10 or numOfSquares == 6:
             self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 1, False)
         self.total_moves = 0
         self.moves_since_last_capture = 0
