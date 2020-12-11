@@ -50,6 +50,8 @@ def main():
     nodes_processed_list_baseline = []
     while games < num_of_games:
         state = Board(board_config)
+        obstacles = state.set_obstacles(3)
+        print(f"Obstacles added at {obstacles}")
         node = Node(state)
         games += 1
         moves = -1

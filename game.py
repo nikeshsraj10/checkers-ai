@@ -30,6 +30,9 @@ class Game:
                     sys.exit(0)
                 except:
                     print("Enter Input in the proper format")   
+            # Add 3 obstacles
+            obstacles = board.set_obstacles(3)
+            print(f"Obstacles added at {obstacles}")
             # Let player choose the AI to play against
             ai_selected = False
             while not ai_selected:

@@ -11,11 +11,11 @@ SOUTHWEST = "southwest"
 SOUTHEAST = "southeast"
 
 #Obstacle
-obstacle = 13
+OBSTACLE = 13
 
 class Board:
     # Initialize the board based on the config the user requested
-    def __init__(self, numOfSquares):
+    def __init__(self, numOfSquares = 8):
         self.board = np.zeros((numOfSquares, numOfSquares))
         self.p1_pawns = {}
         self.p2_pawns = {}
@@ -126,11 +126,11 @@ class Board:
         get_pawn_moves = []
         sw_x, sw_y = self.get_new_coordinates(dir1, pawn)
         se_x, se_y = self.get_new_coordinates(dir2, pawn)
-        if self.check_boundry(sw_x, sw_y) and self.board[sw_x][sw_y] < 0 and self.board[sw_x][sw_y] != obstacle:
+        if self.check_boundry(sw_x, sw_y) and self.board[sw_x][sw_y] < 0 and self.board[sw_x][sw_y] != OBSTACLE:
             sw_sw_x, sw_sw_y = self.get_new_coordinates(dir1, self.p2_pawns[self.board[sw_x][sw_y]])
             if self.check_boundry(sw_sw_x, sw_sw_y) and self.board[sw_sw_x][sw_sw_y] == 0:
                 get_pawn_moves.append((sw_sw_x, sw_sw_y))
-        if self.check_boundry(se_x, se_y) and self.board[se_x][se_y] < 0 and self.board[sw_x][sw_y] != obstacle:
+        if self.check_boundry(se_x, se_y) and self.board[se_x][se_y] < 0 and self.board[sw_x][sw_y] != OBSTACLE:
             se_se_x, se_se_y = self.get_new_coordinates(dir2, self.p2_pawns[self.board[se_x][se_y]])
             if self.check_boundry(se_se_x, se_se_y) and self.board[se_se_x][se_se_y] == 0:
                 get_pawn_moves.append((se_se_x, se_se_y))
@@ -145,11 +145,11 @@ class Board:
         get_pawn_moves = []
         nw_x, nw_y = self.get_new_coordinates(dir1, pawn)
         ne_x, ne_y = self.get_new_coordinates(dir2, pawn)
-        if self.check_boundry(nw_x, nw_y) and self.board[nw_x][nw_y] > 0 and self.board[nw_x][nw_y] != obstacle:
+        if self.check_boundry(nw_x, nw_y) and self.board[nw_x][nw_y] > 0 and self.board[nw_x][nw_y] != OBSTACLE:
             nw_nw_x, nw_nw_y = self.get_new_coordinates(dir1, self.p1_pawns[self.board[nw_x][nw_y]])
             if self.check_boundry(nw_nw_x, nw_nw_y) and self.board[nw_nw_x][nw_nw_y] == 0:
                 get_pawn_moves.append((nw_nw_x, nw_nw_y))
-        if self.check_boundry(ne_x, ne_y) and self.board[ne_x][ne_y] > 0 and self.board[ne_x][ne_y] != obstacle:
+        if self.check_boundry(ne_x, ne_y) and self.board[ne_x][ne_y] > 0 and self.board[ne_x][ne_y] != OBSTACLE:
             ne_ne_x, ne_ne_y = self.get_new_coordinates(dir2, self.p1_pawns[self.board[ne_x][ne_y]])
             if self.check_boundry(ne_ne_x, ne_ne_y) and self.board[ne_ne_x][ne_ne_y] == 0:
                 get_pawn_moves.append((ne_ne_x, ne_ne_y))
@@ -320,8 +320,28 @@ class Board:
     def compute_score(self):
         return len(self.p1_pawns) - len(self.p2_pawns) + \
                (self.total_kings(self.p1_pawns) * 0.5 - self.total_kings(self.p2_pawns) * 0.5)
+    # This method adds obstacles to the board
+    def set_obstacles(self, num_of_obstacles = 0):
+        obstacles = []
+        rows = self.board.shape[0]
+        while num_of_obstacles > 0:
+            x = np.random.randint(rows)
+            y = np.random.randint(rows)
+            if self.board[x, y] == 0:
+                self.board[x, y] = OBSTACLE
+                obstacles.append((x, y))
+                num_of_obstacles -= 1
+        return obstacles
+            
+
 
     # String representation of the Board object
     def __str__(self):
-        return f"Object details: \n{self.board}\n"
+        return f"Board: \n{self.board}\n"
 
+
+if __name__ == "__main__":
+    board = Board()
+    obs = board.set_obstacles(3)
+    print(board)
+    print(obs)
