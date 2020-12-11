@@ -47,7 +47,6 @@ def main():
     moves_list = []
     scores = []
     nodes_processed_list_MCTS = []
-    nodes_processed_list_baseline = []
     while games < num_of_games:
         state = Board(board_config)
         obstacles = state.set_obstacles(3)
@@ -96,14 +95,11 @@ def main():
         moves_list.append(moves)
         scores.append(score)
         nodes_processed_list_MCTS.append(bot.tree_node_processed)
-        nodes_processed_list_baseline.append(bot2.tree_node_processed)
     with open(f"plots/Simulated_{board_config}x{board_config}_{num_of_games}.txt", 'w') as f:
-        f.write(f"Moves List: {moves_list}\nScores List: {scores}\nNodes Processed List MCTS: {nodes_processed_list_MCTS}\nNodes Processed List Baseline: {nodes_processed_list_baseline}")
+        f.write(f"Moves List: {moves_list}\nScores List: {scores}\nNodes Processed List MCTS: {nodes_processed_list_MCTS}")
     print(moves_list)
     print(scores)
     print(nodes_processed_list_MCTS)
-    print(nodes_processed_list_baseline)
-    generatePlots(nodes_processed_list_baseline, "Range of Nodes processed", "Number of games", "Nodes processed for Baseline", f"plots/NodesprocessedBaseline_{board_config}_{num_of_games}")
     generatePlots(nodes_processed_list_MCTS, "Range of Nodes processed", "Number of games", "Nodes processed for MCTS", f"plots/NodesprocessedMCTS_{board_config}_{num_of_games}")
 
 

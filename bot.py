@@ -102,19 +102,9 @@ class Bot:
         return children[max_index]
 
     def base_line_AI(self, node):
-        rollout_calls = 0
-        tree_node_processed = 0
-        for rollout_counter in range(20):
-            self.rollout(node, rollout_calls + 1)
-            rollout_calls = 0
         children = node.children()
-        for child in children:
-            tree_node_processed += child.nodes_processed
-        if len(children) == 0:
-            return None
-        a = np.random.randint(len(children))
-        self.tree_node_processed += tree_node_processed
-        return children[a]
+        c = np.random.choice(len(children))
+        return children[c]
 
 
 if __name__ == "__main__":
