@@ -21,7 +21,7 @@ Average number of nodes processed per game by Baseline AI is *3346*
 
 ## Score distribution 
 
-  ![score distribution](https://github.com/nikeshsraj10/checkers-ai/blob/main/plots/Score.png)
+  ![score distribution](https://github.com/nikeshsraj10/checkers-ai/blob/main/plots/Score_8*8.png)
 
 # Plots for 10x10 Board (50 games completed)
 ## Nodes processed by MCTS AI:
@@ -36,7 +36,10 @@ Average number of nodes processed per game by MCTS AI is *5705*
 
 Average number of nodes processed per game by Baseline AI is *5759*
 
+## Score distribution 
 
+  ![score distribution](https://github.com/nikeshsraj10/checkers-ai/blob/main/plots/Score_10*10.png)
+  
 # Plots for 6x6 Board (100 games completed)
 
 ## Nodes processed by MCTS AI:
@@ -50,3 +53,7 @@ Average number of nodes processed per game by MCTS AI is *568*
 ![nodes processed Baseline](https://github.com/nikeshsraj10/checkers-ai/blob/main/plots/NodesprocessedBaseline_6_100.png)
 
 Average number of nodes processed per game by Baseline AI is *540*
+
+## Score distribution 
+
+  ![score distribution](https://github.com/nikeshsraj10/checkers-ai/blob/main/plots/Score_6*6.png)
