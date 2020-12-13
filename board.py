@@ -10,12 +10,13 @@ NORTHEAST = "northeast"
 SOUTHWEST = "southwest"
 SOUTHEAST = "southeast"
 
-#Obstacle
+# Obstacle
 OBSTACLE = 13
+
 
 class Board:
     # Initialize the board based on the config the user requested
-    def __init__(self, numOfSquares = 8):
+    def __init__(self, numOfSquares=8):
         self.board = np.zeros((numOfSquares, numOfSquares))
         self.p1_pawns = {}
         self.p2_pawns = {}
@@ -29,13 +30,13 @@ class Board:
         self.moves_since_last_capture = 0
 
     # Initialize player pawns and populate the board with their positions
-    def initialize_players(self, start_row, start_index, p1 = True):
+    def initialize_players(self, start_row, start_index, p1=True):
         rows, cols = self.board.shape
         num_rows_to_fill = int((rows - 2) / 2)
         pawn_id = 1
         for row in range(start_row, start_row + num_rows_to_fill):
             for col in range(start_index, cols, 2):
-                if(p1):
+                if (p1):
                     self.board[row, col] = pawn_id
                     self.p1_pawns[pawn_id] = pawn.Pawn(pawn_id, row, col, start_row)
                     pawn_id += 1
@@ -54,30 +55,30 @@ class Board:
         self.board[new_x][new_y] = pawn.id
         self.board[old_x][old_y] = temp
         if p1:
-            self.p1_pawns[pawn.id].coordinates = (new_x,new_y)
+            self.p1_pawns[pawn.id].coordinates = (new_x, new_y)
         else:
             self.p2_pawns[pawn.id].coordinates = (new_x, new_y)
 
-    def get_available_pawns(self,player_pawns_list,p2_list,dir):
+    def get_available_pawns(self, player_pawns_list, p2_list, dir):
         temp_dict = player_pawns_list
         player_available_pawns = []
         for p in temp_dict:
             if not temp_dict[int(p)].is_king:
                 x, y = self.get_new_coordinates(dir[0], temp_dict[p])
                 a, b = self.get_new_coordinates(dir[1], temp_dict[p])
-                if self.check_boundry(x,y) and p not in player_available_pawns:
+                if self.check_boundry(x, y) and p not in player_available_pawns:
                     if self.board[x][y] == 0:
                         player_available_pawns.append(p)
                     elif self.board[x][y] in p2_list:
                         x1, y1 = self.get_new_coordinates(dir[0], p2_list[self.board[x][y]])
-                        if self.check_boundry(x1,y1) and self.board[x1,y1] == 0:
+                        if self.check_boundry(x1, y1) and self.board[x1, y1] == 0:
                             player_available_pawns.append(p)
                 if self.check_boundry(a, b) and p not in player_available_pawns:
                     if self.board[a][b] == 0:
                         player_available_pawns.append(p)
                     elif self.board[a][b] in p2_list:
                         a1, b1 = self.get_new_coordinates(dir[1], p2_list[self.board[a][b]])
-                        if self.check_boundry(a1,b1) and self.board[a1,b1] == 0:
+                        if self.check_boundry(a1, b1) and self.board[a1, b1] == 0:
                             player_available_pawns.append(p)
             else:
                 temp_list = self.get_kings_move(temp_dict[p])
@@ -86,7 +87,7 @@ class Board:
 
         return player_available_pawns
 
-    def check_boundry(self,x,y):
+    def check_boundry(self, x, y):
         rows, cols = self.board.shape
         if (0 <= x < rows) and (0 <= y < cols):
             return True
@@ -101,16 +102,15 @@ class Board:
         Available pawns to move
         """
         if p1 == True:
-            return self.get_available_pawns(self.p1_pawns,self.p2_pawns,[SOUTHWEST,SOUTHEAST])
+            return self.get_available_pawns(self.p1_pawns, self.p2_pawns, [SOUTHWEST, SOUTHEAST])
         else:
-            return self.get_available_pawns(self.p2_pawns,self.p1_pawns,[NORTHWEST,NORTHEAST])
-
+            return self.get_available_pawns(self.p2_pawns, self.p1_pawns, [NORTHWEST, NORTHEAST])
 
     def get_new_coordinates(self, dir, pawn):
         """
         Returns the coordinates one square in a different direction to (x,y).
         """
-        x,y = (pawn.coordinates)
+        x, y = (pawn.coordinates)
         if dir == NORTHWEST:
             return x - 1, y - 1
         elif dir == SOUTHWEST:
@@ -122,7 +122,7 @@ class Board:
         else:
             return 0
 
-    def get_player1_moves(self,dir1,dir2,pawn):
+    def get_player1_moves(self, dir1, dir2, pawn):
         get_pawn_moves = []
         sw_x, sw_y = self.get_new_coordinates(dir1, pawn)
         se_x, se_y = self.get_new_coordinates(dir2, pawn)
@@ -141,7 +141,7 @@ class Board:
 
         return get_pawn_moves
 
-    def get_player2_moves(self,dir1,dir2,pawn):
+    def get_player2_moves(self, dir1, dir2, pawn):
         get_pawn_moves = []
         nw_x, nw_y = self.get_new_coordinates(dir1, pawn)
         ne_x, ne_y = self.get_new_coordinates(dir2, pawn)
@@ -182,14 +182,14 @@ class Board:
 
         return get_pawn_moves
 
-    def get_kings_move(self,pawn):
+    def get_kings_move(self, pawn):
         x, y = (pawn.coordinates)
         get_pawn_moves = []
         pawn_id = self.board[x][y]
         if pawn_id != 0:
             if pawn_id < 0:
-                get_pawn_moves.extend(self.get_player2_moves(NORTHWEST,NORTHEAST,pawn))
-                get_pawn_moves.extend(self.get_player2_moves(SOUTHWEST,SOUTHEAST,pawn))
+                get_pawn_moves.extend(self.get_player2_moves(NORTHWEST, NORTHEAST, pawn))
+                get_pawn_moves.extend(self.get_player2_moves(SOUTHWEST, SOUTHEAST, pawn))
             elif pawn_id > 0:
                 get_pawn_moves.extend(self.get_player1_moves(NORTHWEST, NORTHEAST, pawn))
                 get_pawn_moves.extend(self.get_player1_moves(SOUTHWEST, SOUTHEAST, pawn))
@@ -209,6 +209,7 @@ class Board:
             return -1
         else:
             return 1
+
     # This method controls the pawn's movement
     def move_pawn(self, pawn, coordinate):
         """
@@ -227,10 +228,11 @@ class Board:
             self.move_capture_pawn(pawn, direction)
             #  Check if the move can be chained by another capture
             chain_capture_coordinates = self.get_chain_capture_coordinates(pawn)
-        if (pawn.id > 0 and pawn.coordinates[0] == self.board.shape[0] - 1) or (pawn.id < 0 and pawn.coordinates[0] == 0):
+        if (pawn.id > 0 and pawn.coordinates[0] == self.board.shape[0] - 1) or (
+                pawn.id < 0 and pawn.coordinates[0] == 0):
             pawn.is_king = True
         return chain_capture_coordinates
-            
+
     def get_chain_capture_coordinates(self, pawn):
         chain_capture_coordinates = []
         moves_list = self.get_moves(pawn)
@@ -239,6 +241,7 @@ class Board:
             if move_type == 1:
                 chain_capture_coordinates.append(coordinate)
         return chain_capture_coordinates
+
     # This method is used when the move type is a capturing move
     def move_capture_pawn(self, pawn, direction):
         """
@@ -247,10 +250,12 @@ class Board:
         pawn_id = pawn.id
         pawn_coordinates = pawn.coordinates
         rival_pawn_coordinates = self.get_new_coordinates(direction, pawn)
-        rival_pawn = self.p1_pawns[self.board[rival_pawn_coordinates]] if self.board[rival_pawn_coordinates] > 0 else self.p2_pawns[self.board[rival_pawn_coordinates]]
+        rival_pawn = self.p1_pawns[self.board[rival_pawn_coordinates]] if self.board[rival_pawn_coordinates] > 0 else \
+        self.p2_pawns[self.board[rival_pawn_coordinates]]
         new_x, new_y = self.get_new_coordinates(direction, rival_pawn)
         self.remove_pawn(rival_pawn, rival_pawn.id > 0)
         self.update_board_pawn(new_x, new_y, pawn, pawn.id > 0)
+
     # This method is used when the move type is simple, move the pawn diagonally, change the state of board and coordinate of given pawn
     def simple_move(self, pawn, direction):
         """
@@ -258,16 +263,18 @@ class Board:
         """
         new_x, new_y = self.get_new_coordinates(direction, pawn)
         self.update_board_pawn(new_x, new_y, pawn, pawn.id > 0)
+
     # This method is used to update the state of the board and pawn
-    def update_board_pawn(self, new_x, new_y, pawn, p1 = True):
+    def update_board_pawn(self, new_x, new_y, pawn, p1=True):
         self.board[new_x, new_y] = pawn.id
         self.board[pawn.coordinates] = 0
-        if(p1):
+        if (p1):
             self.p1_pawns[pawn.id].coordinates = (new_x, new_y)
         else:
             self.p2_pawns[pawn.id].coordinates = (new_x, new_y)
+
     # This method is used to remove pawn from players' dictionary and updates the state of board
-    def remove_pawn(self, pawn, p1 = True):
+    def remove_pawn(self, pawn, p1=True):
         self.moves_since_last_capture = 0
         pawn_id = pawn.id
         pawn_coordinates = pawn.coordinates
@@ -276,6 +283,7 @@ class Board:
         else:
             self.p2_pawns.pop(pawn_id, None)
         self.board[pawn_coordinates] = 0
+
     # This method checks if the game is over or not.
     def check_game_status(self):
         """
@@ -285,6 +293,7 @@ class Board:
         if self.moves_since_last_capture > 40 or len(self.p1_pawns) == 0 or len(self.p2_pawns) == 0:
             return True
         return False
+
     # This method is used to declare winner
     def declare_winner(self):
         """
@@ -297,9 +306,10 @@ class Board:
             return 1
         else:
             return 1 if len(self.p1_pawns) > len(self.p2_pawns) else -1
+
     # This method gives the direction from the given pawn and new coordinate
     def get_direction_from_coordinates(self, pawn, new_coordinate):
-        x,y = (pawn.coordinates)
+        x, y = (pawn.coordinates)
         new_x, new_y = new_coordinate
         if x > new_x and y > new_y:
             return NORTHWEST
@@ -310,7 +320,7 @@ class Board:
         elif x < new_x and y < new_y:
             return SOUTHEAST
 
-    def total_kings(self,pawns):
+    def total_kings(self, pawns):
         count = 0
         for pawn in pawns.values():
             if pawn.is_king:
@@ -320,8 +330,50 @@ class Board:
     def compute_score(self):
         return len(self.p1_pawns) - len(self.p2_pawns) + \
                (self.total_kings(self.p1_pawns) * 0.5 - self.total_kings(self.p2_pawns) * 0.5)
+
+    def compute_score2(self):
+        score = 0
+        # if player1's turn
+        if self.total_moves % 2 == 0:
+            for i in range(self.board[0].size):
+                for j in range(self.board[0].size):
+                    pawn = self.board[i][j]
+                    if pawn in self.p1_pawns.keys() or pawn in self.p2_pawns.keys():
+                        if pawn in self.p1_pawns.keys() and self.p1_pawns[pawn].is_king:
+                            score += 10
+                        elif pawn in self.p2_pawns.keys() and self.p2_pawns[pawn].is_king:
+                            score -= 10
+                        elif pawn in self.p1_pawns.keys() and i < 4:
+                            score += 5
+                        elif pawn in self.p2_pawns.keys() and i < 4:
+                            score -= 7
+                        elif pawn in self.p1_pawns.keys() and i >= 4:
+                            score += 7
+                        elif pawn in self.p2_pawns.keys() and i >= 4:
+                            score -= 5
+        # if player2's turn
+        else:
+            for i in range(self.board[0].size):
+                for j in range(self.board[0].size):
+                    pawn = self.board[i][j]
+                    if pawn in self.p1_pawns.keys() or pawn in self.p2_pawns.keys():
+                        if pawn in self.p1_pawns.keys() and self.p1_pawns[pawn].is_king:
+                            score += 10
+                        elif pawn in self.p2_pawns.keys() and self.p2_pawns[pawn].is_king:
+                            score -= 10
+                        elif pawn in self.p1_pawns.keys() and i < 4:
+                            score += 7
+                        elif pawn in self.p2_pawns.keys() and i < 4:
+                            score -= 5
+                        elif pawn in self.p1_pawns.keys() and i >= 4:
+                            score += 7
+                        elif pawn in self.p2_pawns.keys() and i >= 4:
+                            score -= 5
+        #print(f"score: {score / (len(self.p1_pawns) + (len(self.p2_pawns)))}")
+        return score / (len(self.p1_pawns) + (len(self.p2_pawns)))
+
     # This method adds obstacles to the board
-    def set_obstacles(self, num_of_obstacles = 0):
+    def set_obstacles(self, num_of_obstacles=0):
         obstacles = []
         rows = self.board.shape[0]
         while num_of_obstacles > 0:
@@ -332,8 +384,6 @@ class Board:
                 obstacles.append((x, y))
                 num_of_obstacles -= 1
         return obstacles
-            
-
 
     # String representation of the Board object
     def __str__(self):
