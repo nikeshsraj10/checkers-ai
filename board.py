@@ -10,19 +10,23 @@ NORTHEAST = "northeast"
 SOUTHWEST = "southwest"
 SOUTHEAST = "southeast"
 
-# Obstacle
-obstacle = 13
+#Obstacle
+OBSTACLE = 13
+
 
 
 class Board:
     # Initialize the board based on the config the user requested
-    def __init__(self, numOfSquares):
+    def __init__(self, numOfSquares = 8):
         self.board = np.zeros((numOfSquares, numOfSquares))
         self.p1_pawns = {}
         self.p2_pawns = {}
         self.num_of_pawns = ((numOfSquares - 2) / 2) * (numOfSquares / 2)
         self.initialize_players(0, 1)
-        self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 0, False)
+        if numOfSquares == 8:
+            self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 0, False)
+        elif numOfSquares == 10 or numOfSquares == 6:
+            self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 1, False)
         self.total_moves = 0
         self.moves_since_last_capture = 0
 
@@ -68,14 +72,14 @@ class Board:
                         player_available_pawns.append(p)
                     elif self.board[x][y] in p2_list:
                         x1, y1 = self.get_new_coordinates(dir[0], p2_list[self.board[x][y]])
-                        if self.board[x1, y1] == 0:
+                        if self.check_boundry(x1,y1) and self.board[x1,y1] == 0:
                             player_available_pawns.append(p)
                 if self.check_boundry(a, b) and p not in player_available_pawns:
                     if self.board[a][b] == 0:
                         player_available_pawns.append(p)
                     elif self.board[a][b] in p2_list:
                         a1, b1 = self.get_new_coordinates(dir[1], p2_list[self.board[a][b]])
-                        if self.board[a1, b1] == 0:
+                        if self.check_boundry(a1,b1) and self.board[a1,b1] == 0:
                             player_available_pawns.append(p)
             else:
                 temp_list = self.get_kings_move(temp_dict[p])
@@ -123,11 +127,11 @@ class Board:
         get_pawn_moves = []
         sw_x, sw_y = self.get_new_coordinates(dir1, pawn)
         se_x, se_y = self.get_new_coordinates(dir2, pawn)
-        if self.check_boundry(sw_x, sw_y) and self.board[sw_x][sw_y] < 0 and self.board[sw_x][sw_y] != obstacle:
+        if self.check_boundry(sw_x, sw_y) and self.board[sw_x][sw_y] < 0 and self.board[sw_x][sw_y] != OBSTACLE:
             sw_sw_x, sw_sw_y = self.get_new_coordinates(dir1, self.p2_pawns[self.board[sw_x][sw_y]])
             if self.check_boundry(sw_sw_x, sw_sw_y) and self.board[sw_sw_x][sw_sw_y] == 0:
                 get_pawn_moves.append((sw_sw_x, sw_sw_y))
-        if self.check_boundry(se_x, se_y) and self.board[se_x][se_y] < 0 and self.board[sw_x][sw_y] != obstacle:
+        if self.check_boundry(se_x, se_y) and self.board[se_x][se_y] < 0 and self.board[sw_x][sw_y] != OBSTACLE:
             se_se_x, se_se_y = self.get_new_coordinates(dir2, self.p2_pawns[self.board[se_x][se_y]])
             if self.check_boundry(se_se_x, se_se_y) and self.board[se_se_x][se_se_y] == 0:
                 get_pawn_moves.append((se_se_x, se_se_y))
@@ -142,11 +146,11 @@ class Board:
         get_pawn_moves = []
         nw_x, nw_y = self.get_new_coordinates(dir1, pawn)
         ne_x, ne_y = self.get_new_coordinates(dir2, pawn)
-        if self.check_boundry(nw_x, nw_y) and self.board[nw_x][nw_y] > 0 and self.board[nw_x][nw_y] != obstacle:
+        if self.check_boundry(nw_x, nw_y) and self.board[nw_x][nw_y] > 0 and self.board[nw_x][nw_y] != OBSTACLE:
             nw_nw_x, nw_nw_y = self.get_new_coordinates(dir1, self.p1_pawns[self.board[nw_x][nw_y]])
             if self.check_boundry(nw_nw_x, nw_nw_y) and self.board[nw_nw_x][nw_nw_y] == 0:
                 get_pawn_moves.append((nw_nw_x, nw_nw_y))
-        if self.check_boundry(ne_x, ne_y) and self.board[ne_x][ne_y] > 0 and self.board[ne_x][ne_y] != obstacle:
+        if self.check_boundry(ne_x, ne_y) and self.board[ne_x][ne_y] > 0 and self.board[ne_x][ne_y] != OBSTACLE:
             ne_ne_x, ne_ne_y = self.get_new_coordinates(dir2, self.p1_pawns[self.board[ne_x][ne_y]])
             if self.check_boundry(ne_ne_x, ne_ne_y) and self.board[ne_ne_x][ne_ne_y] == 0:
                 get_pawn_moves.append((ne_ne_x, ne_ne_y))
@@ -287,7 +291,7 @@ class Board:
             This method checks the status of the game
             Returns true if the game is over and false if the game is still active in progress
         """
-        if self.moves_since_last_capture > 50 or len(self.p1_pawns) == 0 or len(self.p2_pawns) == 0:
+        if self.moves_since_last_capture > 40 or len(self.p1_pawns) == 0 or len(self.p2_pawns) == 0:
             return True
         return False
 
@@ -302,7 +306,7 @@ class Board:
         elif len(self.p2_pawns) == 0:
             return 1
         else:
-            return 0
+            return 1 if len(self.p1_pawns) > len(self.p2_pawns) else -1
 
     # This method gives the direction from the given pawn and new coordinate
     def get_direction_from_coordinates(self, pawn, new_coordinate):
@@ -316,6 +320,31 @@ class Board:
             return NORTHEAST
         elif x < new_x and y < new_y:
             return SOUTHEAST
+
+
+    def total_kings(self,pawns):
+        count = 0
+        for pawn in pawns.values():
+            if pawn.is_king:
+                count += 1
+        return count
+
+    def compute_score(self):
+        return len(self.p1_pawns) - len(self.p2_pawns) + \
+               (self.total_kings(self.p1_pawns) * 0.5 - self.total_kings(self.p2_pawns) * 0.5)
+    # This method adds obstacles to the board
+    def set_obstacles(self, num_of_obstacles = 0):
+        obstacles = []
+        rows = self.board.shape[0]
+        while num_of_obstacles > 0:
+            x = np.random.randint(rows)
+            y = np.random.randint(rows)
+            if self.board[x, y] == 0:
+                self.board[x, y] = OBSTACLE
+                obstacles.append((x, y))
+                num_of_obstacles -= 1
+        return obstacles
+            
 
     # String representation of the Board object
 
@@ -331,4 +360,11 @@ class Board:
                 self.number_of_kings(self.p1_pawns) * 0.5 - self.number_of_kings(self.p2_pawns))
 
     def __str__(self):
-        return f"Object details: \n{self.board}\n"
+        return f"Board: \n{self.board}\n"
+
+
+if __name__ == "__main__":
+    board = Board()
+    obs = board.set_obstacles(3)
+    print(board)
+    print(obs)
