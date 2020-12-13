@@ -327,11 +327,11 @@ class Board:
                 count += 1
         return count
 
-    def compute_score(self):
+    def game_score(self):
         return len(self.p1_pawns) - len(self.p2_pawns) + \
                (self.total_kings(self.p1_pawns) * 0.5 - self.total_kings(self.p2_pawns) * 0.5)
 
-    def compute_score2(self):
+    def compute_score(self):
         score = 0
         # if player1's turn
         if self.total_moves % 2 == 0:
