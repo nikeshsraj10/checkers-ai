@@ -22,6 +22,27 @@ class Node():
             self.child_list = self.get_actions()
         return self.child_list
 
+    def get_score_estimates(self):
+        score_estimates = np.zeros(len(self.child_list))
+        for index in range(len(self.child_list)):
+            if self.child_list[index].visit_count != 0:
+                score_estimates[index] = self.child_list[index].score_total / self.child_list[index].visit_count
+            if self.state.total_moves % 2 != 0:
+                score_estimates[index] *= -1
+        return score_estimates
+
+    def get_visit_counts(self):
+        visit_counts = np.zeros(len(self.child_list))
+        for index in range(len(self.child_list)):
+            visit_counts[index] = self.child_list[index].visit_count
+        return visit_counts
+    
+    def get_nodes_processed(self):
+        nodes_processed = 0
+        for index in range(len(self.child_list)):
+            nodes_processed += self.child_list[index].nodes_processed
+        return nodes_processed
+
     # This method returns the valid states of the board   
     def get_actions(self):
         states = []
@@ -45,15 +66,7 @@ class Node():
         return states
 
     def choose_child(self):
-        children = self.children()
-        try:
-            c = np.random.randint(len(children))
-        except Exception as e:
-            return None
-        return children[c]
-
-    def compute_uct(self, Q, Np, Nc):
-        return Q + math.sqrt((math.log(Np + 1)) / (Nc + 1))
+        return puct(self)
 
     def __str__(self):
         return f"Node Details\n{self.state}\n {self.visit_count} \t {self.score_estimate}\n"
@@ -61,45 +74,62 @@ class Node():
     def __repr__(self):
         return str(self)
 
+def compute_uct(Q, Np, Nc):
+        return Q + math.sqrt((math.log(Np + 1)) / (Nc + 1))
+
+def puct(node):
+    children = node.children()
+    try:
+        c = np.random.choice(len(children), p=puct_probs(node))
+    except:
+        return None
+    return node.children()[c]
+
+def puct_probs(node):
+    uct_values = []
+    n_p = node.visit_count
+    visit_counts = node.get_visit_counts()
+    score_estimates = node.get_score_estimates()
+    for index in range(len(visit_counts)):
+        nc = visit_counts[index]
+        qc = score_estimates[index]
+        uct = compute_uct(qc, n_p, nc)
+        uct_values.append(uct)
+    # Compute Softmax of all the uct values
+    exp = np.exp(np.array(uct_values))
+    probs = exp / exp.sum()
+    return probs
 
 class Bot:
     def __init__(self):
         self.tree_node_processed = 0
 
-    def rollout(self, node, count):
+    def rollout(self, node, count, max_depth):
         child = node.choose_child()
-        if node.state.check_game_status() or count > 100 or child is None:
+        if node.state.check_game_status() or count > max_depth or child is None:
             # TODO: Consider King pawn for the score calculation
             result = node.state.compute_score()
         else:
-            result = self.rollout(child, count + 1)
+            result = self.rollout(child, count + 1, max_depth)
         node.visit_count += 1
         node.score_total += result
         node.score_estimate = node.score_total / node.visit_count
         return result
 
-    def mcts(self, node):
+    def mcts(self, node, num_rollouts = 25):
         rollout_calls = 0
         tree_node_processed = 0
-        for rollout_counter in range(25):
-            self.rollout(node, rollout_calls + 1)
+        for rollout_counter in range(num_rollouts):
+            self.rollout(node, rollout_calls + 1, max_depth = 100)
             rollout_calls = 0
         children = node.children()
         if len(children) == 0:
             return None
         max_index = 0
-        if len(children) > 0:
-            max_score = float('-inf')
-            for counter in range(len(children)):
-                score = node.compute_uct(children[counter].score_estimate, node.visit_count,
-                                         children[counter].visit_count)
-                tree_node_processed += children[counter].nodes_processed
-                # print(score)
-                if score > max_score:
-                    max_score = score
-                    max_index = counter
-        self.tree_node_processed += tree_node_processed
-        return children[max_index]
+        self.tree_node_processed += node.get_nodes_processed()
+        # self.tree_node_processed = node.get_nodes_processed()
+        max = np.argmax(node.get_score_estimates())
+        return children[max]
 
     def base_line_AI(self, node):
         children = node.children()

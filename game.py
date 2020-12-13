@@ -58,7 +58,7 @@ class Game:
                 if board.total_moves % 2 == 0:
                     nodes_processed = game_bot.tree_node_processed
                     node = Node(board)
-                    node = game_bot.mcts(node)
+                    node = game_bot.mcts(node, num_rollouts = 25)
                     print(f"Nodes processed this turn {game_bot.tree_node_processed - nodes_processed}")
                 else: 
                     while not pawn_selected:
