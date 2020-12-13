@@ -6,15 +6,21 @@ from copy import deepcopy
 import numpy as np
 from board import Board
 import math
+import torch as tr
+import checkers_net as cn
+import checkers_data as cd
 
 
+
+net = None
 class Node():
-    def __init__(self, state):
+    def __init__(self, state, depth = 0):
         self.state = state
         self.visit_count = 0
         self.score_total = 0
         self.score_estimate = 0
         self.nodes_processed = 0
+        self.depth = depth
         self.child_list = None  # lazy child generation
 
     def children(self):
@@ -53,7 +59,7 @@ class Node():
                     temp_board = deepcopy(self.state)
                     temp_board.move_pawn(temp_board.p1_pawns[pawn], move)
                     self.nodes_processed += 1
-                    states.append(Node(temp_board))
+                    states.append(Node(temp_board, self.depth + 1))
         else:
             for pawn in self.state.check_available_pawns_to_move(False):
                 valid_moves = self.state.get_moves(self.state.p2_pawns[pawn])
@@ -61,7 +67,7 @@ class Node():
                     temp_board = deepcopy(self.state)
                     temp_board.move_pawn(temp_board.p2_pawns[pawn], move)
                     self.nodes_processed += 1
-                    states.append(Node(temp_board))
+                    states.append(Node(temp_board, self.depth + 1))
 
         return states
 
@@ -85,6 +91,22 @@ def puct(node):
         return None
     return node.children()[c]
 
+def get_nn(board_size):
+    if net is None:
+        net = cn.CheckersNet(board_size)
+        net.load_state_dict(tr.load("model%d.pth" % board_size))
+    return net
+
+def nn_puct(node):
+    if net is None:
+        get_nn(node.state.shape[0])
+    with tr.no_grad():
+        x = tr.stack(tuple(map(cd.encode, [child.state for child in node.children()])))
+        y = net(x)
+        probs = tr.softmax(y.flatten(), dim=0)
+        a = np.random.choice(len(probs), p=probs.detach().numpy())
+    return node.children()[a]
+
 def puct_probs(node):
     uct_values = []
     n_p = node.visit_count
@@ -104,24 +126,22 @@ class Bot:
     def __init__(self):
         self.tree_node_processed = 0
 
-    def rollout(self, node, count, max_depth):
+    def rollout(self, node, max_depth):
         child = node.choose_child()
-        if node.state.check_game_status() or count > max_depth or child is None:
+        if node.state.check_game_status() or node.depth == max_depth or child is None:
             # TODO: Consider King pawn for the score calculation
             result = node.state.compute_score()
         else:
-            result = self.rollout(child, count + 1, max_depth)
+            result = self.rollout(child, max_depth)
         node.visit_count += 1
         node.score_total += result
         node.score_estimate = node.score_total / node.visit_count
         return result
 
-    def mcts(self, node, num_rollouts = 25):
-        rollout_calls = 0
+    def mcts(self, node, num_rollouts = 25, max_depth = 100, choose_method = nn_puct):
         tree_node_processed = 0
         for rollout_counter in range(num_rollouts):
-            self.rollout(node, rollout_calls + 1, max_depth = 100)
-            rollout_calls = 0
+            self.rollout(node, max_depth = 100)
         children = node.children()
         if len(children) == 0:
             return None
@@ -129,10 +149,12 @@ class Bot:
         self.tree_node_processed += node.get_nodes_processed()
         # self.tree_node_processed = node.get_nodes_processed()
         max = np.argmax(node.get_score_estimates())
-        return children[max]
+        return max, node
 
     def base_line_AI(self, node):
         children = node.children()
+        if len(children) == 0:
+            return None
         c = np.random.choice(len(children))
         return children[c]
 
@@ -150,6 +172,8 @@ if __name__ == "__main__":
     nodes_processed_list_baseline = []
     while games < 1:
         state = Board(8)
+        obstacles = state.set_obstacles(3)
+        print(f"Obstacles added at {obstacles}")
         node = Node(state)
         games += 1
         moves = -1
@@ -163,7 +187,8 @@ if __name__ == "__main__":
                 print(f"Moves since last capture: {state.moves_since_last_capture}")
                 print("AI's turn")
                 nodes_processed = bot.tree_node_processed
-                node = bot.mcts(node)
+                index, parent_state = bot.mcts(node)
+                node = parent_state.children()[index]
                 nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
                 print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
                 if node is None:

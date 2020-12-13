@@ -64,7 +64,8 @@ def main():
                 print(f"Moves since last capture: {state.moves_since_last_capture}")
                 print("AI's turn")
                 nodes_processed = bot.tree_node_processed
-                node = bot.mcts(node)
+                index, parent_state = bot.mcts(node)
+                node = parent_state.children()[index]
                 nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
                 print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
                 if node is None:
