@@ -5,7 +5,7 @@ from pathlib import Path
 path = Path('~/../data/')
 
 def CheckersNet(board_size):
-    in_features = 5 * board_size**2
+    in_features = 6 * board_size**2
     out_features = 1
     # Return torch.nn.Module
     return Sequential(
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     board_size = 8
     num_games = 50
     if board_size == 8:
-        num_of_pawns = 12
+        num_of_pawns = 6
     elif board_size == 10:
         num_of_pawns = 20
     elif board_size == 6:
