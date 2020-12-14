@@ -1,6 +1,8 @@
 import numpy as np
 import torch as tr
 from torch.nn import Sequential, Conv2d, Linear, Flatten, LeakyReLU, Tanh
+from pathlib import Path
+path = Path('~/../data/')
 
 def CheckersNet(board_size):
     in_features = 5 * board_size**2
@@ -30,7 +32,7 @@ if __name__ == "__main__":
     print(net)
 
     import pickle as pk
-    with open("../data%d.pkl" % board_size,"rb") as f: (x, y_targ) = pk.load(f)
+    with open(path/f"data{board_size}.pkl","rb") as f: (x, y_targ) = pk.load(f)
 
     # Optimization loop  
     optimizer = tr.optim.Adam(net.parameters())
@@ -45,7 +47,8 @@ if __name__ == "__main__":
         train_loss.append(e_train.item() / (len(shuffle)-split))
         test_loss.append(e_test.item() / split)
     
-    tr.save(net.state_dict(), "model%d.pth" % board_size)
+    
+    tr.save(net.state_dict(), path/f"model{board_size}.pth")
     
     import matplotlib.pyplot as pt
     pt.plot(train_loss,'b-')

@@ -42,7 +42,7 @@ def encode(state):
                 encoded_state[4, row, col] = 1
     return encoded_state
 
-def get_batch(board_size=6, num_games=2, num_rollouts=25, max_depth=5, choose_method=None):
+def get_batch(board_size=6, num_games=2, num_rollouts=50, max_depth=6, choose_method=None):
     training_data = generate(board_size=board_size, num_games=num_games, num_rollouts=num_rollouts, max_depth=max_depth)
     inputs = None
     scores = []
@@ -59,7 +59,7 @@ def get_batch(board_size=6, num_games=2, num_rollouts=25, max_depth=5, choose_me
 
 if __name__ == "__main__":
     
-    board_size, num_games = 8, 25
+    board_size, num_games = 8, 50
     try:
         inputs, outputs = get_batch(board_size, num_games=num_games)
     except Exception as e:
@@ -68,5 +68,7 @@ if __name__ == "__main__":
     print(outputs[-1])
 
     import pickle as pk
-    with open("data%d.pkl" % board_size, "wb") as f: pk.dump((inputs, outputs), f)
+    from pathlib import Path
+    path = Path('~/../data/')
+    with open(path/f"data{board_size}.pkl", "wb") as f: pk.dump((inputs, outputs), f)
 
