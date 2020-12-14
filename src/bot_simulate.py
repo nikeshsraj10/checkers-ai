@@ -79,8 +79,10 @@ def main():
                 print(f"Moves since last capture: {state.moves_since_last_capture}")
                 print("AI's turn")
                 nodes_processed = bot.tree_node_processed
-                index, parent_state = bot.mcts(node)
-                node = parent_state.children()[index]
+                res = bot.mcts(node)
+                if res is not None:
+                    index, parent_state = res
+                    node = parent_state.children()[index]
                 nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
                 print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
                 if node is None:
@@ -91,8 +93,6 @@ def main():
                 print("Baseline AI turn")
                 nodes_processed = bot2.tree_node_processed
                 node = bot2.base_line_AI(node)
-                nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
-                print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
                 if node is None:
                     break
             state = node.state
@@ -111,12 +111,14 @@ def main():
         moves_list.append(moves)
         scores.append(score)
         nodes_processed_list_MCTS.append(bot.tree_node_processed)
-    with open(f"/../plots/Simulated_{board_config}x{board_config}_{num_of_games}.txt", 'w') as f:
+    from pathlib import Path
+    path = Path('~/../plots/')
+    with open(path/f"Simulated_{board_config}x{board_config}_{num_of_games}_{num_of_pawns}.txt", 'w') as f:
         f.write(f"Moves List: {moves_list}\nScores List: {scores}\nNodes Processed List MCTS: {nodes_processed_list_MCTS}")
     print(moves_list)
     print(scores)
     print(nodes_processed_list_MCTS)
-    generatePlots(nodes_processed_list_MCTS, "Range of Nodes processed", "Number of games", "Nodes processed for MCTS", f"/../plots/NodesprocessedMCTS_{board_config}_{num_of_games}")
+    generatePlots(nodes_processed_list_MCTS, "Range of Nodes processed", "Number of games", "Nodes processed for MCTS", path/f"NodesprocessedMCTS_{board_config}_{num_of_games}_{num_of_pawns}")
 
 
 def generatePlots(nodes_processed, x_label, y_label, title, file_name):
