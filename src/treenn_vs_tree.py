@@ -29,12 +29,12 @@ def accept_board_config(val):
         return 8
 # type = lambda x : x if (x == 8 or x == 10) else 8
 def main():
-    parser = argparse.ArgumentParser(description="Enter the size of board and number of games you want to simulate")
-    parser.add_argument('board_config', default = 8, type = accept_board_config)
-    parser.add_argument('num_of_games', default = 100, type = check_num_of_games)
-    args = parser.parse_args()
-    board_config = args.board_config
-    num_of_games = args.num_of_games
+    # parser = argparse.ArgumentParser(description="Enter the size of board and number of games you want to simulate")
+    # parser.add_argument('board_config', default = 8, type = accept_board_config)
+    # parser.add_argument('num_of_games', default = 100, type = check_num_of_games)
+    # args = parser.parse_args()
+    board_config = 8 # args.board_config
+    num_of_games = 1 # args.num_of_games
     num_of_pawns = 0
     print(f"Board config selected:{board_config}\nNumber of games to be played: {num_of_games}")
     while True:
@@ -85,7 +85,7 @@ def main():
                 print(state)
                 print(f"Moves since last capture: {node.state.moves_since_last_capture}")
                 print("NN + MCTS's turn")
-                node = player_1.player_BaseLine_AI(bot, state)
+                node = player_1.player_NN_MCTS_AI(bot, state)
                 print(f"Nodes processed this turn {bot.tree_node_processed}")
                 if node is None:
                     break
