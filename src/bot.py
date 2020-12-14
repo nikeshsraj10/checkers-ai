@@ -25,17 +25,18 @@ def puct(node):
         return None
     return node.children()[c]
 
-def get_nn(board_size):
+def get_nn(board_size, num_of_pawns):
     global net
+    num_of_matches = 25 if board_size == 10 else 50  
     if net is None:
-        net = cn.CheckersNet(board_size)
-        net.load_state_dict(tr.load(path/f"model{board_size}.pth"))
+        net = cn.CheckersNet_v2(board_size)
+        net.load_state_dict(tr.load(path/f"model{board_size}_{num_of_pawns}_{num_of_matches}_v2.pth"))
     return net
 
 def nn_puct(node):
     global net
     if net is None:
-        get_nn(node.state.board.shape[0])
+        get_nn(node.state.board.shape[0], node.state.num_of_pawns)
     with tr.no_grad():
         try:
             encoded = []
@@ -68,7 +69,7 @@ def puct_probs(node):
     return probs
 
 class Node():
-    def __init__(self, state, depth = 0, choose_method = puct):
+    def __init__(self, state, depth = 0, choose_method = nn_puct):
         self.state = state
         self.visit_count = 0
         self.score_total = 0
@@ -174,8 +175,8 @@ class Bot:
 
 if __name__ == "__main__":
     child = None
-    board_size = 10
-    state = Board(board_size)
+    board_size = 8
+    state = Board(board_size, num_of_pawns = 6)
     node = Node(state)
     moves = -1
     nodes_processed = 0
@@ -185,7 +186,7 @@ if __name__ == "__main__":
     nodes_processed_list_MCTS = []
     nodes_processed_list_baseline = []
     while games < 1:
-        state = Board(board_size)
+        state = Board(board_size, num_of_pawns = 6)
         obstacles = state.set_obstacles(3)
         print(f"Obstacles added at {obstacles}")
         node = Node(state)
@@ -232,8 +233,6 @@ if __name__ == "__main__":
         scores.append(score)
         nodes_processed_list_MCTS.append(bot.tree_node_processed)
         nodes_processed_list_baseline.append(bot2.tree_node_processed)
-    with open('../plots/SingleGameData.txt', 'w') as f:
-        f.write(f"Moves List: {moves_list}\nScores List: {scores}\nNodes Processed List MCTS: {nodes_processed_list_MCTS}\nNodes Processed List Baseline: {nodes_processed_list_baseline}")
     print(moves_list)
     print(scores)
     print(nodes_processed_list_MCTS)

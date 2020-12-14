@@ -29,9 +29,9 @@ class Board:
             self.num_of_pawns = 6
         num_of_rows = self.num_of_pawns / (numOfSquares / 2)
         self.initialize_players(0, 1, self.num_of_pawns)
-        if numOfSquares == 8:
+        if numOfSquares == 8 and num_of_pawns != 6:
             self.initialize_players(int(numOfSquares - num_of_rows), 0, self.num_of_pawns, False)
-        elif numOfSquares == 10 or numOfSquares == 6:
+        else:
             self.initialize_players(int(numOfSquares - num_of_rows), 1, self.num_of_pawns, False)
         self.total_moves = 0
         self.moves_since_last_capture = 0
