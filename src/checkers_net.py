@@ -28,11 +28,18 @@ def optimization_step(optimizer, net, x, y_targ):
 if __name__ == "__main__":
 
     board_size = 8
+    num_games = 50
+    if board_size == 8:
+        num_of_pawns = 12
+    elif board_size == 10:
+        num_of_pawns = 20
+    elif board_size == 6:
+        num_of_pawns = 6
     net = CheckersNet(board_size=board_size)
     print(net)
 
     import pickle as pk
-    with open(path/f"data{board_size}.pkl","rb") as f: (x, y_targ) = pk.load(f)
+    with open(path/f"data{board_size}_{num_of_pawns}_{num_games}.pkl","rb") as f: (x, y_targ) = pk.load(f)
 
     # Optimization loop  
     optimizer = tr.optim.Adam(net.parameters())
@@ -48,7 +55,7 @@ if __name__ == "__main__":
         test_loss.append(e_test.item() / split)
     
     
-    tr.save(net.state_dict(), path/f"model{board_size}.pth")
+    tr.save(net.state_dict(), path/f"model{board_size}_{num_of_pawns}_{num_games}.pth")
     
     import matplotlib.pyplot as pt
     pt.plot(train_loss,'b-')

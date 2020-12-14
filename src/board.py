@@ -3,6 +3,7 @@ This modules defines the board of the game based on the configuration the user h
 """
 import numpy as np
 import pawn
+import math
 
 ##DIRECTIONS##
 NORTHWEST = "northwest"
@@ -11,31 +12,39 @@ SOUTHWEST = "southwest"
 SOUTHEAST = "southeast"
 
 # Obstacle
-OBSTACLE = 13
+OBSTACLE = 21
 
 
 class Board:
     # Initialize the board based on the config the user requested
-    def __init__(self, numOfSquares=8):
+
+    def __init__(self, numOfSquares=8, num_of_pawns = 12):
         self.board = np.zeros((numOfSquares, numOfSquares))
         self.p1_pawns = {}
         self.p2_pawns = {}
-        self.num_of_pawns = ((numOfSquares - 2) / 2) * (numOfSquares / 2)
-        self.initialize_players(0, 1)
+        self.num_of_pawns = num_of_pawns
+        if numOfSquares == 10:
+            self.num_of_pawns = 20
+        elif numOfSquares == 6:
+            self.num_of_pawns = 6
+        num_of_rows = self.num_of_pawns / (numOfSquares / 2)
+        self.initialize_players(0, 1, self.num_of_pawns)
         if numOfSquares == 8:
-            self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 0, False)
+            self.initialize_players(int(numOfSquares - num_of_rows), 0, self.num_of_pawns, False)
         elif numOfSquares == 10 or numOfSquares == 6:
-            self.initialize_players(int(numOfSquares - ((numOfSquares - 2) / 2)), 1, False)
+            self.initialize_players(int(numOfSquares - num_of_rows), 1, self.num_of_pawns, False)
         self.total_moves = 0
         self.moves_since_last_capture = 0
 
     # Initialize player pawns and populate the board with their positions
-    def initialize_players(self, start_row, start_index, p1=True):
+    def initialize_players(self, start_row, start_index, num_of_pawns, p1=True):
         rows, cols = self.board.shape
-        num_rows_to_fill = int((rows - 2) / 2)
+        num_rows_to_fill = math.ceil(num_of_pawns / (cols / 2))
         pawn_id = 1
         for row in range(start_row, start_row + num_rows_to_fill):
             for col in range(start_index, cols, 2):
+                if pawn_id > num_of_pawns:
+                    break
                 if (p1):
                     self.board[row, col] = pawn_id
                     self.p1_pawns[pawn_id] = pawn.Pawn(pawn_id, row, col, start_row)

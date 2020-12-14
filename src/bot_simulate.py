@@ -38,8 +38,23 @@ def main():
     args = parser.parse_args()
     board_config = args.board_config
     num_of_games = args.num_of_games
+    num_of_pawns = 0
     print(f"Board config selected:{board_config}\nNumber of games to be played: {num_of_games}")
-    state = Board(board_config)
+    while True:
+        if(board_config == 8):
+            print("Select Number of Pawns for the board")
+            numOfPawns = int(input("12,\t9,\t6\n"))
+            if numOfPawns == 6 or numOfPawns == 9 or numOfPawns == 12:
+                print("num_of_pawns")
+                num_of_pawns = numOfPawns
+                break
+        else:
+            if board_config == 6:
+                num_of_pawns = 6
+            elif board_config == 10:
+                num_of_pawns = 20
+            break
+    state = Board(board_config, num_of_pawns)
     node = Node(state)
     moves = -1
     nodes_processed = 0
@@ -48,7 +63,7 @@ def main():
     scores = []
     nodes_processed_list_MCTS = []
     while games < num_of_games:
-        state = Board(board_config)
+        state = Board(board_config, num_of_pawns)
         obstacles = state.set_obstacles(3)
         print(f"Obstacles added at {obstacles}")
         node = Node(state)

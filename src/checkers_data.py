@@ -60,6 +60,13 @@ def get_batch(board_size=6, num_games=2, num_rollouts=50, max_depth=6, choose_me
 if __name__ == "__main__":
     
     board_size, num_games = 8, 50
+    if board_size == 8:
+        num_of_pawns = 12
+    elif board_size == 10:
+        num_of_pawns = 20
+    elif board_size == 6:
+        num_of_pawns = 6
+
     try:
         inputs, outputs = get_batch(board_size, num_games=num_games)
     except Exception as e:
@@ -70,5 +77,5 @@ if __name__ == "__main__":
     import pickle as pk
     from pathlib import Path
     path = Path('~/../data/')
-    with open(path/f"data{board_size}.pkl", "wb") as f: pk.dump((inputs, outputs), f)
+    with open(path/f"data{board_size}_{num_of_pawns}_{num_games}.pkl", "wb") as f: pk.dump((inputs, outputs), f)
 

@@ -9,8 +9,8 @@ import math
 import torch as tr
 import checkers_net as cn
 import checkers_data as cd
-
-
+from pathlib import Path
+path = Path('~/../data/')
 
 net = None
 
@@ -29,7 +29,7 @@ def get_nn(board_size):
     global net
     if net is None:
         net = cn.CheckersNet(board_size)
-        net.load_state_dict(tr.load("model%d.pth" % board_size))
+        net.load_state_dict(tr.load(path/f"model{board_size}.pth"))
     return net
 
 def nn_puct(node):
@@ -40,12 +40,8 @@ def nn_puct(node):
         try:
             encoded = []
             children = node.children()
-            if len(children) == 0:
-                print("zero children")
             for child in children:
                 encoded.append(cd.encode(child.state))
-            if len(encoded) == 0:
-                print(len(encoded))
             x = tr.stack(encoded)
             # x = tr.stack(tuple(map(cd.encode, [child.state for child in node.children() if child is not None])))
             y = net(x)
@@ -127,8 +123,6 @@ class Node():
                     temp_board.move_pawn(temp_board.p2_pawns[pawn], move)
                     self.nodes_processed += 1
                     states.append(Node(temp_board, self.depth + 1))
-        if len(states) == 0:
-            states.append(Node(self.state,self.depth + 1))
         return states
 
     def choose_child(self):
@@ -157,10 +151,10 @@ class Bot:
         node.score_estimate = node.score_total / node.visit_count
         return result
 
-    def mcts(self, node, num_rollouts = 25, max_depth = 100, choose_method = nn_puct):
+    def mcts(self, node, num_rollouts = 50, max_depth = 6, choose_method = nn_puct):
         tree_node_processed = 0
         for rollout_counter in range(num_rollouts):
-            self.rollout(node, max_depth = 100)
+            self.rollout(node, max_depth = max_depth)
         children = node.children()
         if len(children) == 0:
             return None
@@ -180,7 +174,8 @@ class Bot:
 
 if __name__ == "__main__":
     child = None
-    state = Board(8)
+    board_size = 10
+    state = Board(board_size)
     node = Node(state)
     moves = -1
     nodes_processed = 0
@@ -190,7 +185,7 @@ if __name__ == "__main__":
     nodes_processed_list_MCTS = []
     nodes_processed_list_baseline = []
     while games < 1:
-        state = Board(8)
+        state = Board(board_size)
         obstacles = state.set_obstacles(3)
         print(f"Obstacles added at {obstacles}")
         node = Node(state)
@@ -218,8 +213,6 @@ if __name__ == "__main__":
                 print("Baseline AI turn")
                 nodes_processed = bot2.tree_node_processed
                 node = bot2.base_line_AI(node)
-                nodes_processed_this_turn = bot.tree_node_processed - nodes_processed
-                print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
                 if node is None:
                     break
             state = node.state
