@@ -1,28 +1,39 @@
 import numpy as np
 import torch as tr
-from torch.nn import Sequential, Conv2d, Linear, Flatten, LeakyReLU, Tanh
+from torch.nn import Sequential, Conv2d, Linear, Flatten, LeakyReLU, Tanh, Sigmoid
 from pathlib import Path
 path = Path('~/../data/')
 
 def CheckersNet(board_size):
     in_features = 6 * board_size**2
     out_features = 1
+    hidden_features = [int(in_features * 2), int(in_features / 2), int(in_features / 4)]
     # Return torch.nn.Module
     return Sequential(
         Flatten(),
-        Linear(in_features, out_features)
+        Linear(in_features, hidden_features[0]),
+        Tanh(),
+        Linear(hidden_features[0], hidden_features[1]),
+        LeakyReLU(),
+        Linear(hidden_features[1], hidden_features[2]),
+        Tanh(),
+        Linear(hidden_features[2], out_features),
+        Sigmoid()
     )
 
 def CheckersNet_v2(board_size):
     in_features = 6 * board_size**2
     out_features = 1
-    hidden_features = int(in_features / 2)
+    hidden_features = [int(in_features / 2), int(in_features / 4)]
     # Return torch.nn.Module
     return Sequential(
         Flatten(),
-        Linear(in_features, hidden_features),
+        Linear(in_features, hidden_features[0]),
         LeakyReLU(),
-        Linear(hidden_features, out_features)
+        Linear(hidden_features[0], hidden_features[1]),
+        LeakyReLU(),
+        Linear(hidden_features[1], out_features),
+        Sigmoid()
     )
 
 def calculate_loss(net, x, y_targ):
@@ -39,15 +50,15 @@ def optimization_step(optimizer, net, x, y_targ):
 
 if __name__ == "__main__":
 
-    board_size = 8
-    num_games = 50
+    board_size = 10
+    num_games = 25 if board_size == 10 else 50
     if board_size == 8:
-        num_of_pawns = 9
+        num_of_pawns = 6
     elif board_size == 10:
         num_of_pawns = 20
     elif board_size == 6:
         num_of_pawns = 6
-    net = CheckersNet_v2(board_size=board_size)
+    net = CheckersNet(board_size=board_size)
     print(net)
 
     import pickle as pk
@@ -59,7 +70,7 @@ if __name__ == "__main__":
     shuffle = np.random.permutation(range(len(x)))
     split = 100
     train, test = shuffle[:-split], shuffle[-split:]
-    for epoch in range(5000):
+    for epoch in range(750):
         y_train, e_train = optimization_step(optimizer, net, x[train], y_targ[train])
         y_test, e_test = calculate_loss(net, x[test], y_targ[test])
         if epoch % 10 == 0: print("%d: %f (%f)" % (epoch, e_train.item(), e_test.item()))
@@ -67,7 +78,7 @@ if __name__ == "__main__":
         test_loss.append(e_test.item() / split)
     
     
-    tr.save(net.state_dict(), path/f"model{board_size}_{num_of_pawns}_{num_games}_v2.pth")
+    tr.save(net.state_dict(), path/f"model{board_size}_{num_of_pawns}_{num_games}.pth")
     
     import matplotlib.pyplot as pt
     pt.plot(train_loss,'b-')

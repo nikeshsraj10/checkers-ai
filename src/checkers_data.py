@@ -19,7 +19,7 @@ def generate(board_size=8, num_games=2, num_rollouts=10, max_depth=4, num_of_paw
             # Stop when game is over
             if state.check_game_status(): break            
             # Otherwise, use MCTS
-            res = game_bot.mcts(bot.Node(state, choose_method = state.choose_method), num_rollouts = num_rollouts, max_depth = max_depth, choose_method = bot.puct)
+            res = game_bot.mcts(bot.Node(state, choose_method = bot.puct), num_rollouts = num_rollouts, max_depth = max_depth, choose_method = bot.puct)
             if res is not None:
                 no_moves = 0
                 a, node = res
@@ -71,9 +71,9 @@ def get_batch(board_size=6, num_games=2, num_rollouts=100, max_depth=6, choose_m
 
 if __name__ == "__main__":
     
-    board_size, num_games = 8, 50
+    board_size, num_games = 6, 50
     if board_size == 8:
-        num_of_pawns = 12
+        num_of_pawns = 6
     elif board_size == 10:
         num_of_pawns = 20
     elif board_size == 6:
