@@ -13,6 +13,18 @@ def CheckersNet(board_size):
         Linear(in_features, out_features)
     )
 
+def CheckersNet_v2(board_size):
+    in_features = 6 * board_size**2
+    out_features = 1
+    hidden_features = int(in_features / 2)
+    # Return torch.nn.Module
+    return Sequential(
+        Flatten(),
+        Linear(in_features, hidden_features),
+        LeakyReLU(),
+        Linear(hidden_features, out_features)
+    )
+
 def calculate_loss(net, x, y_targ):
     y = net(x)
     e = tr.sum((y - y_targ)**2)
@@ -30,12 +42,12 @@ if __name__ == "__main__":
     board_size = 8
     num_games = 50
     if board_size == 8:
-        num_of_pawns = 6
+        num_of_pawns = 9
     elif board_size == 10:
         num_of_pawns = 20
     elif board_size == 6:
         num_of_pawns = 6
-    net = CheckersNet(board_size=board_size)
+    net = CheckersNet_v2(board_size=board_size)
     print(net)
 
     import pickle as pk
@@ -55,7 +67,7 @@ if __name__ == "__main__":
         test_loss.append(e_test.item() / split)
     
     
-    tr.save(net.state_dict(), path/f"model{board_size}_{num_of_pawns}_{num_games}.pth")
+    tr.save(net.state_dict(), path/f"model{board_size}_{num_of_pawns}_{num_games}_v2.pth")
     
     import matplotlib.pyplot as pt
     pt.plot(train_loss,'b-')
