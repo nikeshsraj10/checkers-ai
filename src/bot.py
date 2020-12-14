@@ -69,7 +69,7 @@ def puct_probs(node):
     return probs
 
 class Node():
-    def __init__(self, state, depth = 0, choose_method = nn_puct):
+    def __init__(self, state, depth = 0, choose_method = puct):
         self.state = state
         self.visit_count = 0
         self.score_total = 0

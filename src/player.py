@@ -75,11 +75,8 @@ class Player:
 
     # If selected player's Control is BaseLine AI
     def player_BaseLine_AI(self, game_bot, board):
-        nodes_processed = game_bot.tree_node_processed
         node = Node(board, depth=0)
         node = game_bot.base_line_AI(node)
-        nodes_processed_this_turn = game_bot.tree_node_processed - nodes_processed
-        print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
         return node
 
     # If selected player's Control is NN+MCTS AI
