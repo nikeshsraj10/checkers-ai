@@ -36,7 +36,7 @@ if __name__ == "__main__":
     optimizer = tr.optim.Adam(net.parameters())
     train_loss, test_loss = [], []
     shuffle = np.random.permutation(range(len(x)))
-    split = 10
+    split = 100
     train, test = shuffle[:-split], shuffle[-split:]
     for epoch in range(5000):
         y_train, e_train = optimization_step(optimizer, net, x[train], y_targ[train])
