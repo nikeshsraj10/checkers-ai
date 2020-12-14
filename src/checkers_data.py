@@ -19,7 +19,7 @@ def generate(board_size=8, num_games=2, num_rollouts=10, max_depth=4, num_of_paw
             # Stop when game is over
             if state.check_game_status(): break            
             # Otherwise, use MCTS
-            res = game_bot.mcts(bot.Node(state), num_rollouts, max_depth)
+            res = game_bot.mcts(bot.Node(state, choose_method = state.choose_method), num_rollouts = num_rollouts, max_depth = max_depth, choose_method = bot.puct)
             if res is not None:
                 no_moves = 0
                 a, node = res

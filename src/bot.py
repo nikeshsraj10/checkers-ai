@@ -10,7 +10,7 @@ import torch as tr
 import checkers_net as cn
 import checkers_data as cd
 from pathlib import Path
-path = Path('~/../data/')
+path = Path('data/')
 
 net = None
 
@@ -115,7 +115,7 @@ class Node():
                     temp_board = deepcopy(self.state)
                     temp_board.move_pawn(temp_board.p1_pawns[pawn], move)
                     self.nodes_processed += 1
-                    states.append(Node(temp_board, self.depth + 1))
+                    states.append(Node(temp_board, self.depth + 1, choose_method = self.choose_method))
         else:
             for pawn in self.state.check_available_pawns_to_move(False):
                 valid_moves = self.state.get_moves(self.state.p2_pawns[pawn])
@@ -123,7 +123,7 @@ class Node():
                     temp_board = deepcopy(self.state)
                     temp_board.move_pawn(temp_board.p2_pawns[pawn], move)
                     self.nodes_processed += 1
-                    states.append(Node(temp_board, self.depth + 1))
+                    states.append(Node(temp_board, self.depth + 1, choose_method = self.choose_method))
         return states
 
     def choose_child(self):

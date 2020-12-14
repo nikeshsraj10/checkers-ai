@@ -65,16 +65,18 @@ class Player:
     # If selected player's Control is MCTS AI
     def player_MCTS_AI(self, game_bot, board):
         nodes_processed = game_bot.tree_node_processed
-        node = Node(board, depth=6, choose_method=puct)
-        index, parent_state = game_bot.mcts(node, num_rollouts=100)
-        node = parent_state.children()[index]
+        node = Node(board, depth=0, choose_method=puct)
+        res = game_bot.mcts(node, num_rollouts=100)
+        if res is not None:
+            index, parent_state = res
+            node = parent_state.children()[index]
         print(f"Nodes processed this turn {game_bot.tree_node_processed - nodes_processed}")
         return node
 
     # If selected player's Control is BaseLine AI
     def player_BaseLine_AI(self, game_bot, board):
         nodes_processed = game_bot.tree_node_processed
-        node = Node(board, depth=6)
+        node = Node(board, depth=0)
         node = game_bot.base_line_AI(node)
         nodes_processed_this_turn = game_bot.tree_node_processed - nodes_processed
         print(f"nodes_processed_this_turn {nodes_processed_this_turn}")
@@ -83,8 +85,10 @@ class Player:
     # If selected player's Control is NN+MCTS AI
     def player_NN_MCTS_AI(self, game_bot, board):
         nodes_processed = game_bot.tree_node_processed
-        node = Node(board, depth=6, choose_method=nn_puct)
-        index, parent_state = game_bot.mcts(node, num_rollouts=100)
-        node = parent_state.children()[index]
+        node = Node(board, depth=0, choose_method=nn_puct)
+        res = game_bot.mcts(node, num_rollouts=100)
+        if res is not None:
+            index, parent_state = res
+            node = parent_state.children()[index]
         print(f"Nodes processed this turn {game_bot.tree_node_processed - nodes_processed}")
         return node

@@ -67,9 +67,11 @@ class Game:
             player_1 = Player(True)
             player_2 = Player(False)
             nodes_processed = 0
+            num_passes = 0
             while not board.check_game_status():
                 print(board)
                 print(f"Move #: {board.total_moves}")
+                prev_move = board.total_moves
                 if board.total_moves % 2 == 0:
                     if player1_select != 1:
                         print("AI Turn\n")
@@ -105,6 +107,12 @@ class Game:
                         board = node.state
                     else:
                         break
+                if board.total_moves == prev_move:
+                    num_passes += 1
+                else:
+                    num_passes = 0
+                if num_passes == 5:
+                    break
             print("Game Over\n")
             winner = board.declare_winner()
             if winner == 1:

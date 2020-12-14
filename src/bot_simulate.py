@@ -11,7 +11,7 @@ from matplotlib.ticker import PercentFormatter
 from board import Board
 import math
 from bot import Node
-from bot import Bot
+from bot import Bot, puct
 
 def check_num_of_games(val):
     try:
@@ -55,7 +55,7 @@ def main():
                 num_of_pawns = 20
             break
     state = Board(board_config, num_of_pawns)
-    node = Node(state)
+    node = Node(state, depth = 0)
     moves = -1
     nodes_processed = 0
     games = 0
@@ -66,7 +66,7 @@ def main():
         state = Board(board_config, num_of_pawns)
         obstacles = state.set_obstacles(3)
         print(f"Obstacles added at {obstacles}")
-        node = Node(state)
+        node = Node(state, depth = 0)
         games += 1
         moves = -1
         bot = Bot()
