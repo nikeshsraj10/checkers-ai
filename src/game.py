@@ -13,7 +13,7 @@ class Game:
         self.jump = False
 
     def start_game(self):
-        global node
+        node = None
         print("Select the board configuration you want to play")
         try:
             board_created = False
@@ -56,7 +56,7 @@ class Game:
                 try:
                     player2_select = int(
                         input("Choose player 2 Control: \n1: Human \t2: BaseLine AI \t3: MCTS AI "
-                              "\t2: NN+MCTS AI"))
+                              "\t4: NN+MCTS AI"))
                     if player2_select == 1 or player2_select == 2 or player2_select == 3 or player2_select == 4:
                         player2_selected = True
                 except (KeyboardInterrupt, SystemExit) as e:
@@ -64,40 +64,47 @@ class Game:
                 except:
                     print("Enter Input in the proper format")
             game_bot = Bot()
-            player_1 = Player(False)
-            player_2 = Player(True)
+            player_1 = Player(True)
+            player_2 = Player(False)
             nodes_processed = 0
             while not board.check_game_status():
                 print(board)
                 print(f"Move #: {board.total_moves}")
                 if board.total_moves % 2 == 0:
-                    print("AI Turn\n")
+                    if player1_select != 1:
+                        print("AI Turn\n")
+                    else:
+                        print("Player1, It's your turn to play\n")
                 else:
-                    print("Player2, It's your turn to play\n")
+                    if player2_select != 1:
+                        print("AI Turn\n")
+                    else:
+                        print("Player2, It's your turn to play\n")
                 # Player1 Turn
                 pawn_selected = False
                 if board.total_moves % 2 == 0:
                     if player1_select == 1:
-                        player_1.player_human(board)
+                        player_1.player_human(board, board.p1_pawns)
                     elif player1_select == 2:
-                        node = player_1.player_BaseLine_AI(game_bot,board)
+                        node = player_1.player_BaseLine_AI(game_bot, board)
                     elif player1_select == 3:
-                        node = player_1.player_MCTS_AI(game_bot,board)
+                        node = player_1.player_MCTS_AI(game_bot, board)
                     elif player1_select == 4:
-                        node = player_1.player_NN_MCTS_AI(game_bot,board)
+                        node = player_1.player_NN_MCTS_AI(game_bot, board)
                 else:
                     if player2_select == 1:
-                        player_2.player_human(board)
+                        player_2.player_human(board, board.p2_pawns)
                     elif player2_select == 2:
                         node = player_2.player_BaseLine_AI(game_bot, board)
                     elif player2_select == 3:
                         node = player_2.player_MCTS_AI(game_bot, board)
                     elif player2_select == 4:
                         node = player_2.player_NN_MCTS_AI(game_bot, board)
-                if node:
-                    board = node.state
-                else:
-                    break
+                if player1_select > 1 or player2_select > 1:
+                    if node:
+                        board = node.state
+                    else:
+                        break
             print("Game Over\n")
             winner = board.declare_winner()
             if winner == 1:
