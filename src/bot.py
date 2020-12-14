@@ -53,7 +53,7 @@ def nn_puct(node):
             a = np.random.choice(len(probs), p=probs.detach().numpy())
             return node.children()[a]
         except Exception as e:
-            print(e)
+            return None
             
 
 def puct_probs(node):
@@ -127,7 +127,8 @@ class Node():
                     temp_board.move_pawn(temp_board.p2_pawns[pawn], move)
                     self.nodes_processed += 1
                     states.append(Node(temp_board, self.depth + 1))
-
+        if len(states) == 0:
+            states.append(Node(self.state,self.depth + 1))
         return states
 
     def choose_child(self):
@@ -224,7 +225,7 @@ if __name__ == "__main__":
             state = node.state
         print(f"Total moves: {moves}")
         score = state.compute_score()
-        if(len(state.p1_pawns) > len(state.p2_pawns)):
+        if len(state.p1_pawns) > len(state.p2_pawns):
             print("MCTS AI Won")
             print(f"Score = {score}")
         elif len(state.p1_pawns) < len(state.p2_pawns):
