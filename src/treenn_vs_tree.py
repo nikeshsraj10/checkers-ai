@@ -29,12 +29,12 @@ def accept_board_config(val):
         return 8
 # type = lambda x : x if (x == 8 or x == 10) else 8
 def main():
-    # parser = argparse.ArgumentParser(description="Enter the size of board and number of games you want to simulate")
-    # parser.add_argument('board_config', default = 8, type = accept_board_config)
-    # parser.add_argument('num_of_games', default = 100, type = check_num_of_games)
-    # args = parser.parse_args()
-    board_config = 8 # args.board_config
-    num_of_games = 1 # args.num_of_games
+    parser = argparse.ArgumentParser(description="Enter the size of board and number of games you want to simulate")
+    parser.add_argument('board_config', default = 8, type = accept_board_config)
+    parser.add_argument('num_of_games', default = 100, type = check_num_of_games)
+    args = parser.parse_args()
+    board_config = args.board_config
+    num_of_games = args.num_of_games
     num_of_pawns = 0
     print(f"Board config selected:{board_config}\nNumber of games to be played: {num_of_games}")
     while True:
@@ -70,26 +70,34 @@ def main():
         bot2 = Bot()
         player_1 = Player(True)
         player_2 = Player(False)
+        num_passes = 0
         while not state.check_game_status():
             moves += 1
             print(f"Game #: {games}/{num_of_games}\nMove #: {moves}")
+            prev_move = state.total_moves
             if moves % 2 == 0:
                 print(state)
                 print(f"Moves since last capture: {state.moves_since_last_capture}")
-                print("MCTS's turn")
-                node = player_2.player_MCTS_AI(bot2, state)
-                print(f"Nodes processed this turn {bot2.tree_node_processed}")
-                if node is None:
-                    break
-            else:
-                print(state)
-                print(f"Moves since last capture: {node.state.moves_since_last_capture}")
                 print("NN + MCTS's turn")
                 node = player_1.player_NN_MCTS_AI(bot, state)
                 print(f"Nodes processed this turn {bot.tree_node_processed}")
                 if node is None:
                     break
+            else:
+                print(state)
+                print(f"Moves since last capture: {node.state.moves_since_last_capture}")
+                print("MCTS's turn")
+                node = player_2.player_MCTS_AI(bot2, state)
+                print(f"Nodes processed this turn {bot2.tree_node_processed}")
+                if node is None:
+                    break
             state = node.state
+            if state.total_moves == prev_move:
+                num_passes += 1
+            else:
+                num_passes = 0
+            if num_passes == 5:
+                    break
         print(f"Total moves: {moves}")
         score = state.compute_score()
         if(len(state.p1_pawns) > len(state.p2_pawns)):
@@ -113,6 +121,7 @@ def main():
     print(moves_list)
     print(scores)
     print(nodes_processed_list_MCTS)
+    print(nodes_processed_list_NNMCTS)
     generatePlots(nodes_processed_list_MCTS, "Range of Nodes processed", "Number of games", "Nodes processed for MCTS", path/f"NodesprocessedMCTS_{board_config}_{num_of_games}_{num_of_pawns}")
     generatePlots(nodes_processed_list_NNMCTS, "Range of Nodes processed", "Number of games", "Nodes processed for NN + MCTS", path/f"NodesprocessedNNMCTS_{board_config}_{num_of_games}_{num_of_pawns}")
 
