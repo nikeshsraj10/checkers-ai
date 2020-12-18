@@ -1,5 +1,8 @@
+'''
+This module is used to configure the kind of player selected
+Human, Baseline AI, MCTS, MCTS + NN
+'''
 import sys
-
 from bot import Node, nn_puct, puct
 
 class Player:

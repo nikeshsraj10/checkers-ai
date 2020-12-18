@@ -1,3 +1,6 @@
+'''
+This module defines NN architecture and trains the models
+'''
 import numpy as np
 import torch as tr
 from torch.nn import Sequential, Conv2d, Linear, Flatten, LeakyReLU, Tanh, Sigmoid
@@ -18,7 +21,7 @@ def CheckersNet(board_size):
         Linear(hidden_features[1], hidden_features[2]),
         Tanh(),
         Linear(hidden_features[2], out_features),
-        Sigmoid()
+        Tanh()
     )
 
 def CheckersNet_v2(board_size):
@@ -33,7 +36,7 @@ def CheckersNet_v2(board_size):
         Linear(hidden_features[0], hidden_features[1]),
         LeakyReLU(),
         Linear(hidden_features[1], out_features),
-        Sigmoid()
+        Tanh()
     )
 
 def calculate_loss(net, x, y_targ):
@@ -49,11 +52,11 @@ def optimization_step(optimizer, net, x, y_targ):
     return y, e
 
 if __name__ == "__main__":
-
-    board_size = 10
+    # TODO: Trained 8x8 12p board for new NN arch, Need to train models for other configurations 
+    board_size = 8
     num_games = 25 if board_size == 10 else 50
     if board_size == 8:
-        num_of_pawns = 6
+        num_of_pawns = 12
     elif board_size == 10:
         num_of_pawns = 20
     elif board_size == 6:
@@ -70,7 +73,7 @@ if __name__ == "__main__":
     shuffle = np.random.permutation(range(len(x)))
     split = 100
     train, test = shuffle[:-split], shuffle[-split:]
-    for epoch in range(750):
+    for epoch in range(2000):
         y_train, e_train = optimization_step(optimizer, net, x[train], y_targ[train])
         y_test, e_test = calculate_loss(net, x[test], y_targ[test])
         if epoch % 10 == 0: print("%d: %f (%f)" % (epoch, e_train.item(), e_test.item()))
