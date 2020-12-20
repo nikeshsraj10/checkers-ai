@@ -1,6 +1,6 @@
 '''
 This module handles the code for the game bot
-MCTS
+Basline AI, MCTS, MCTS + NN
 '''
 from copy import deepcopy
 import numpy as np
@@ -14,9 +14,11 @@ path = Path('data/')
 
 net = None
 
+# Node selection during tree descent is achieved by node maximizing the value returned here
 def compute_uct(Q, Np, Nc):
         return Q + math.sqrt((math.log(Np + 1)) / (Nc + 1))
 
+# Select the next state node by examining the node's children using just MCTS
 def puct(node):
     children = node.children()
     try:
@@ -25,6 +27,7 @@ def puct(node):
         return None
     return node.children()[c]
 
+# Returns NN for the given board config
 def get_nn(board_size, num_of_pawns):
     global net
     num_of_matches = 25 if board_size == 10 else 50  
@@ -33,6 +36,7 @@ def get_nn(board_size, num_of_pawns):
         net.load_state_dict(tr.load(path/f"model{board_size}_{num_of_pawns}_{num_of_matches}_v2.pth"))
     return net
 
+# Select the next state node by examining the node's children: MCTS + NN
 def nn_puct(node):
     global net
     if net is None:
@@ -52,7 +56,7 @@ def nn_puct(node):
         except Exception as e:
             return None
             
-
+# Returns softmax of node's children uct values
 def puct_probs(node):
     uct_values = []
     n_p = node.visit_count
@@ -67,6 +71,7 @@ def puct_probs(node):
     exp = np.exp(np.array(uct_values))
     probs = exp / exp.sum()
     return probs
+
 
 class Node():
     def __init__(self, state, depth = 0, choose_method = puct):

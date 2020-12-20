@@ -1,3 +1,6 @@
+'''
+This module is created to enable simulation of games between bots MCTS v MCTS + NN
+'''
 import argparse
 from copy import deepcopy
 import numpy as np

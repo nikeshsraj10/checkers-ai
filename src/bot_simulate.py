@@ -1,6 +1,5 @@
 '''
-This module handles the code for the game bot
-MCTS
+This module is created to enable simulation of games between bots MCTS vs Baseline AI
 '''
 import argparse
 from copy import deepcopy
@@ -13,6 +12,7 @@ import math
 from bot import Node
 from bot import Bot, puct
 
+# evaluate num_games argument passed from command line
 def check_num_of_games(val):
     try:
         val = int(val)
@@ -21,7 +21,7 @@ def check_num_of_games(val):
         return val
     except:
         return 100
-
+# evaluate board_config argument passed from command line
 def accept_board_config(val):
     try:
         val = int(val)
@@ -30,7 +30,7 @@ def accept_board_config(val):
         return 8
     except:
         return 8
-# type = lambda x : x if (x == 8 or x == 10) else 8
+
 def main():
     parser = argparse.ArgumentParser(description="Enter the size of board and number of games you want to simulate")
     parser.add_argument('board_config', default = 8, type = accept_board_config)
@@ -112,6 +112,7 @@ def main():
         scores.append(score)
         nodes_processed_list_MCTS.append(bot.tree_node_processed)
     from pathlib import Path
+    # TODO: `~` not working in Mac, Analyse and fix
     path = Path('~/../plots/')
     with open(path/f"Simulated_{board_config}x{board_config}_{num_of_games}_{num_of_pawns}.txt", 'w') as f:
         f.write(f"Moves List: {moves_list}\nScores List: {scores}\nNodes Processed List MCTS: {nodes_processed_list_MCTS}")

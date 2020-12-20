@@ -11,13 +11,12 @@ NORTHEAST = "northeast"
 SOUTHWEST = "southwest"
 SOUTHEAST = "southeast"
 
-# Obstacle
+# Constant for Obstacle in the game, 21 because max pawn_id in our game is 20
 OBSTACLE = 21
 
 
 class Board:
     # Initialize the board based on the config the user requested
-
     def __init__(self, numOfSquares=8, num_of_pawns = 12):
         self.board = np.zeros((numOfSquares, numOfSquares))
         self.p1_pawns = {}
@@ -58,6 +57,7 @@ class Board:
             else:
                 start_index = 0
 
+    # Updates the board and pawn object to according to new coordinate
     def update_board_pawn(self, new_x, new_y, pawn, p1=True):
         old_x, old_y = pawn.coordinates
         temp = self.board[new_x][new_y]
@@ -67,7 +67,8 @@ class Board:
             self.p1_pawns[pawn.id].coordinates = (new_x, new_y)
         else:
             self.p2_pawns[pawn.id].coordinates = (new_x, new_y)
-
+    # Returns all the available to move for a given player
+    # TODO: Rename the parameters to follow consistency
     def get_available_pawns(self, player_pawns_list, p2_list, dir):
         temp_dict = player_pawns_list
         player_available_pawns = []
@@ -96,6 +97,7 @@ class Board:
 
         return player_available_pawns
 
+    # Checks if given point (x, y) is within the board
     def check_boundry(self, x, y):
         rows, cols = self.board.shape
         if (0 <= x < rows) and (0 <= y < cols):
@@ -115,6 +117,7 @@ class Board:
         else:
             return self.get_available_pawns(self.p2_pawns, self.p1_pawns, [NORTHWEST, NORTHEAST])
 
+    # Given direction, return the corresponding pawn
     def get_new_coordinates(self, dir, pawn):
         """
         Returns the coordinates one square in a different direction to (x,y).
@@ -130,7 +133,7 @@ class Board:
             return x + 1, y + 1
         else:
             return 0
-
+    # Given pawn, return all the coordinates the pawn can move for player 1
     def get_player1_moves(self, dir1, dir2, pawn):
         get_pawn_moves = []
         sw_x, sw_y = self.get_new_coordinates(dir1, pawn)
@@ -149,7 +152,8 @@ class Board:
             get_pawn_moves.append((se_x, se_y))
 
         return get_pawn_moves
-
+    # Given pawn, return all the coordinates the pawn can move for player 1
+    # TODO: combine this and above method to one single method
     def get_player2_moves(self, dir1, dir2, pawn):
         get_pawn_moves = []
         nw_x, nw_y = self.get_new_coordinates(dir1, pawn)
@@ -191,6 +195,7 @@ class Board:
 
         return get_pawn_moves
 
+    # Given a King pawn, get all the possible coordinates that the pawn can move to
     def get_kings_move(self, pawn):
         x, y = (pawn.coordinates)
         get_pawn_moves = []
@@ -329,6 +334,7 @@ class Board:
         elif x < new_x and y < new_y:
             return SOUTHEAST
 
+    # Returns the number of kings in the given pawn list
     def total_kings(self, pawns):
         count = 0
         for pawn in pawns.values():
@@ -336,10 +342,11 @@ class Board:
                 count += 1
         return count
 
+    # Evaluate score (simpler version)
     def game_score(self):
         return len(self.p1_pawns) - len(self.p2_pawns) + \
                (self.total_kings(self.p1_pawns) * 0.5 - self.total_kings(self.p2_pawns) * 0.5)
-
+    # Computes the score of the state according to pawn coordinate position and is_king status
     def compute_score(self):
         score = 0
         # if player1's turn

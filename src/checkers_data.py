@@ -1,8 +1,10 @@
+# This module is used to generate training data
 import itertools as it
 import board as bg
 import bot
 import torch as tr
 
+# Generate game states data for given board config
 def generate(board_size=8, num_games=2, num_rollouts=10, max_depth=4, num_of_pawns = 12):
 
     data = []    
@@ -35,6 +37,7 @@ def generate(board_size=8, num_games=2, num_rollouts=10, max_depth=4, num_of_paw
 
     return data
 
+# one hot encoding of the game state
 def encode(state):
     encoded_state = tr.zeros(6, *state.board.shape)
     rows, cols = state.board.shape
@@ -54,6 +57,7 @@ def encode(state):
                 encoded_state[5, row, col] = 1
     return encoded_state
 
+# Generates data batch wise for NN Model training
 def get_batch(board_size=6, num_games=2, num_rollouts=100, max_depth=6, choose_method=None, num_of_pawns = 6):
     training_data = generate(board_size=board_size, num_games=num_games, num_rollouts=num_rollouts, max_depth=max_depth, num_of_pawns = num_of_pawns)
     inputs = None
