@@ -2,13 +2,15 @@ import sys
 
 from bot import Node, nn_puct, puct
 
+
 class Player:
-    def __init__(self,flag):
+    def __init__(self, flag):
         #  False : player_1, True : Player_2
         self.player_num = flag
 
     # If selected player's Control is Human
-    def player_human(self, board,player_pawn):
+    def player_human(self, board, player_pawn):
+        global coordinate_selected
         player_pawn_choice = 0
         pawn_selected = False
         while not pawn_selected:
@@ -18,49 +20,53 @@ class Player:
                 player_pawn_choice = int(input("Select Pawn to move\n"))
                 if player_pawn_choice in available_pawns:
                     pawn_selected = True
+                else:
+                    print("Enter Input in the proper format")
             except (KeyboardInterrupt, SystemExit) as e:
                 sys.exit(0)
             except:
                 print("Enter Input in the proper format")
             coordinate_selected = False
-            while not coordinate_selected:
+        while not coordinate_selected:
+            try:
+                available_coordinates = board.get_moves(player_pawn[player_pawn_choice])
+                print(available_coordinates)
+                player_coordinate_choice = int(
+                    input("Select the position of Coordinate to move, for eg: 1 or 2 or 3 or 4\n"))
+                if len(available_coordinates) >= player_coordinate_choice > 0:
+                    coordinate_selected = True
+                else:
+                    print("Enter Input in the proper format")
+            except (KeyboardInterrupt, SystemExit) as e:
+                sys.exit(0)
+            except:
+                print("Enter Input in the proper format")
+        pawn_chain_capture_coordinates = board.move_pawn(player_pawn[player_pawn_choice],
+                                                         available_coordinates[player_coordinate_choice - 1])
+        if len(pawn_chain_capture_coordinates) > 0:
+            print(board)
+            proper_input = False
+            # TODO: Add a while loop here to take care of wrong user input
+            curr_moves = board.total_moves
+            while not proper_input:
                 try:
-                    available_coordinates = board.get_moves(player_pawn[player_pawn_choice])
-                    print(available_coordinates)
-                    player_coordinate_choice = int(
-                        input("Select the position of Coordinate to move, for eg: 1 or 2 or 3 or 4\n"))
-                    if len(available_coordinates) >= player_coordinate_choice > 0:
-                        coordinate_selected = True
+                    board.total_moves = curr_moves
+                    chain_capture = int(input(
+                        "You captured a pawn and now the capture can be chained!!\nDo you want to proceed?\n Select "
+                        "1.Yes 2.No\n"))
+                    if chain_capture == 1:
+                        board.total_moves -= 1
+                        print(pawn_chain_capture_coordinates)
+                        chain_capture_coordinate_choice = int(
+                            input("Select the position of Coordinate to move, for eg: 1 or 2 or 3 or 4\n"))
+                        if len(pawn_chain_capture_coordinates) >= chain_capture_coordinate_choice > 0:
+                            proper_input = True
+                            board.move_pawn(player_pawn[player_pawn_choice],
+                                            pawn_chain_capture_coordinates[chain_capture_coordinate_choice - 1])
                 except (KeyboardInterrupt, SystemExit) as e:
                     sys.exit(0)
                 except:
                     print("Enter Input in the proper format")
-            pawn_chain_capture_coordinates = board.move_pawn(player_pawn[player_pawn_choice],
-                                                             available_coordinates[player_coordinate_choice - 1])
-            if len(pawn_chain_capture_coordinates) > 0:
-                print(board)
-                proper_input = False
-                # TODO: Add a while loop here to take care of wrong user input
-                curr_moves = board.total_moves
-                while not proper_input:
-                    try:
-                        board.total_moves = curr_moves
-                        chain_capture = int(input(
-                            "You captured a pawn and now the capture can be chained!!\nDo you want to proceed?\n Select "
-                            "1.Yes 2.No\n"))
-                        if chain_capture == 1:
-                            board.total_moves -= 1
-                            print(pawn_chain_capture_coordinates)
-                            chain_capture_coordinate_choice = int(
-                                input("Select the position of Coordinate to move, for eg: 1 or 2 or 3 or 4\n"))
-                            if len(pawn_chain_capture_coordinates) >= chain_capture_coordinate_choice > 0:
-                                proper_input = True
-                                board.move_pawn(player_pawn[player_pawn_choice],
-                                                pawn_chain_capture_coordinates[chain_capture_coordinate_choice - 1])
-                    except (KeyboardInterrupt, SystemExit) as e:
-                        sys.exit(0)
-                    except:
-                        print("Enter Input in the proper format")
 
     # If selected player's Control is MCTS AI
     def player_MCTS_AI(self, game_bot, board):

@@ -87,26 +87,31 @@ class Game:
                 if board.total_moves % 2 == 0:
                     if player1_select == 1:
                         player_1.player_human(board, board.p1_pawns)
-                    elif player1_select == 2:
-                        node = player_1.player_BaseLine_AI(game_bot, board)
-                    elif player1_select == 3:
-                        node = player_1.player_MCTS_AI(game_bot, board)
-                    elif player1_select == 4:
-                        node = player_1.player_NN_MCTS_AI(game_bot, board)
+                    else:
+                        if player1_select == 2:
+                            node = player_1.player_BaseLine_AI(game_bot, board)
+                        elif player1_select == 3:
+                            node = player_1.player_MCTS_AI(game_bot, board)
+                        elif player1_select == 4:
+                            node = player_1.player_NN_MCTS_AI(game_bot, board)
+                        if node:
+                            board = node.state
+                        else:
+                            break
                 else:
                     if player2_select == 1:
                         player_2.player_human(board, board.p2_pawns)
-                    elif player2_select == 2:
-                        node = player_2.player_BaseLine_AI(game_bot, board)
-                    elif player2_select == 3:
-                        node = player_2.player_MCTS_AI(game_bot, board)
-                    elif player2_select == 4:
-                        node = player_2.player_NN_MCTS_AI(game_bot, board)
-                if player1_select > 1 or player2_select > 1:
-                    if node:
-                        board = node.state
                     else:
-                        break
+                        if player2_select == 2:
+                            node = player_2.player_BaseLine_AI(game_bot, board)
+                        elif player2_select == 3:
+                            node = player_2.player_MCTS_AI(game_bot, board)
+                        elif player2_select == 4:
+                            node = player_2.player_NN_MCTS_AI(game_bot, board)
+                        if node:
+                            board = node.state
+                        else:
+                            break
                 if board.total_moves == prev_move:
                     num_passes += 1
                 else:
